@@ -1,44 +1,81 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  
+  const [roles, setRoles] = useState([]);
+  const [functions, setFunctions] = useState([]);
 
- const handleFormSubmit = async (values, { resetForm }) => {
-  try {
-    const formattedValues = {
-      EmpId: values.empId,
-      Name: values.name,
-      Password: values.password,
-      Mobile: values.mobile,
-      Email: values.email,
-      RM_Mail: values.rm_mail,
-      Role: values.role,
-      Functions: values.functions,
-      Status: values.status,
-      DateOfJoining: values.dateOfJoining,
+  // Fetch roles and functions from the API
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get("https://namami-infotech.com/NiveshanBackend/api/users/roles.php");
+        // Extracting the array from the response
+        if (response.data.records && Array.isArray(response.data.records)) {
+          setRoles(response.data.records);
+        } else {
+          console.error("Roles data is not an array:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
     };
 
-    const response = await axios.post(
-      "https://namami-infotech.com/NiveshanBackend/api/users/add_user.php",
-      formattedValues
-    );
+    const fetchFunctions = async () => {
+      try {
+        const response = await axios.get("https://namami-infotech.com/NiveshanBackend/api/users/functions.php");
+        // Extracting the array from the response
+        if (response.data.records && Array.isArray(response.data.records)) {
+          setFunctions(response.data.records);
+        } else {
+          console.error("Functions data is not an array:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching functions:", error);
+      }
+    };
 
-    if (response.data) {
-      alert("User created successfully");
-      console.log(response.data); // Optional: to log the API response
-      resetForm(); // Resets the form after successful submission
+    fetchRoles();
+    fetchFunctions();
+  }, []);
+
+  const handleFormSubmit = async (values, { resetForm }) => {
+    try {
+      const formattedValues = {
+        EmpId: values.empId,
+        Name: values.name,
+        Password: values.password,
+        Mobile: values.mobile,
+        Email: values.email,
+        RM_Mail: values.rm_mail,
+        Role: values.role,
+        Functions: values.functions,
+        Status: values.status,
+        DateOfJoining: values.dateOfJoining,
+      };
+
+      const response = await axios.post(
+        "https://namami-infotech.com/NiveshanBackend/api/users/add_user.php",
+        formattedValues
+      );
+
+      if (response.data) {
+        alert("User created successfully");
+        console.log(response.data); // Optional: to log the API response
+        resetForm(); // Resets the form after successful submission
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert("Failed to create user");
     }
-  } catch (error) {
-    console.error("Error creating user:", error);
-    alert("Failed to create user");
-  }
-};
-
+  };
 
   return (
     <Box m="20px">
@@ -144,45 +181,46 @@ const Form = () => {
                 helperText={touched.rm_mail && errors.rm_mail}
                 sx={{ gridColumn: "span 2" }}
               />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Role"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.role}
-                name="role"
-                error={!!touched.role && !!errors.role}
-                helperText={touched.role && errors.role}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Functions"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.functions}
-                name="functions"
-                error={!!touched.functions && !!errors.functions}
-                helperText={touched.functions && errors.functions}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Status"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.status}
-                name="status"
-                error={!!touched.status && !!errors.status}
-                helperText={touched.status && errors.status}
-                sx={{ gridColumn: "span 2" }}
-              />
+              {/* Dropdown for Role */}
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="role-label">Role</InputLabel>
+                <Select
+                  labelId="role-label"
+                  name="role"
+                  value={values.role}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.role && !!errors.role}
+                >
+                  {roles.map((role) => (
+                    <MenuItem key={role.role_id} value={role.role_name}>
+                      {role.role_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {touched.role && errors.role && <div>{errors.role}</div>}
+              </FormControl>
+
+              {/* Dropdown for Functions */}
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="functions-label">Functions</InputLabel>
+                <Select
+                  labelId="functions-label"
+                  name="functions"
+                  value={values.functions}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.functions && !!errors.functions}
+                >
+                  {functions.map((func) => (
+                    <MenuItem key={func.function_id} value={func.function_name}>
+                      {func.function_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {touched.functions && errors.functions && <div>{errors.functions}</div>}
+              </FormControl>
+
               <TextField
                 fullWidth
                 variant="filled"
@@ -214,18 +252,14 @@ const phoneRegExp =
   /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
 const checkoutSchema = yup.object().shape({
-  empId: yup.string().required("required"),
+  empId: yup.string(), // EmpId is not required anymore
   name: yup.string().required("required"),
   password: yup.string().required("required"),
-  mobile: yup
-    .string()
-    .matches(phoneRegExp, "Phone number is not valid")
-    .required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  rm_mail: yup.string().email("invalid email").required("required"),
+  mobile: yup.string().matches(phoneRegExp, "Phone number is not valid").required("required"),
+  email: yup.string().email("Invalid email").required("required"),
+  rm_mail: yup.string().email("Invalid email"),
   role: yup.string().required("required"),
   functions: yup.string().required("required"),
-  status: yup.string().required("required"),
   dateOfJoining: yup.string().required("required"),
 });
 
@@ -238,7 +272,6 @@ const initialValues = {
   rm_mail: "",
   role: "",
   functions: "",
-  status: "",
   dateOfJoining: "",
 };
 

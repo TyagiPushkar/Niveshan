@@ -3,57 +3,76 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import Devices from "@mui/icons-material/Devices";
 import Header from "../../components/Header";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 
-const Team = () => {
+const Asset = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
-  const [teamData, setTeamData] = useState([]);
+  const [assetData, setAssetData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch data from the API
   useEffect(() => {
-    const fetchTeamData = async () => {
+    const fetchAssetData = async () => {
       try {
-        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/users/get_users.php");
+        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php");
         const data = await response.json();
-        setTeamData(data.records); // Assuming the data is under "records"
+        setAssetData(data.data); // Assuming the assets data is under "data"
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching team data:", error);
+        console.error("Error fetching asset data:", error);
         setLoading(false);
       }
     };
 
-    fetchTeamData();
+    fetchAssetData();
   }, []);
 
   const columns = [
-    { field: "EmpId", headerName: "EmpId", width: 100 },
+    { field: "AssetId", headerName: "Asset ID", width: 120 },
     {
-      field: "Name",
+      field: "AssetType",
+      headerName: "Type",
+      flex: 1,
+    },
+    {
+      field: "AssetName",
       headerName: "Name",
       flex: 1,
-      cellClassName: "name-column--cell",
     },
     {
-      field: "Mobile",
-      headerName: "Mobile",
+      field: "AssetCondition",
+      headerName: "Condition",
       flex: 1,
     },
     {
-      field: "Email",
-      headerName: "Email",
+      field: "Make",
+      headerName: "Make",
       flex: 1,
     },
     {
-      field: "Role",
-      headerName: "Role",
+      field: "Model",
+      headerName: "Model",
+      flex: 1,
+    },
+    {
+      field: "SerialNo",
+      headerName: "S/No.",
+      flex: 1,
+    },
+    
+    {
+      field: "Quantity",
+      headerName: "Qty",
+      type: "number",
+      width: 100,
+    },
+    
+    {
+      field: "VendorName",
+      headerName: "Vendor",
       flex: 1,
     },
     {
@@ -61,22 +80,19 @@ const Team = () => {
       headerName: "Status",
       flex: 1,
     },
-    {
-      field: "DateOfJoining",
-      headerName: "Date of Joining",
-      flex: 1,
-    },
   ];
-
+ const handleRowClick = (params) => {
+    navigate(`/asset/${params.row.AssetId}`); // Navigating to the detail page with AssetId
+  };
   const handleRedirect = () => {
-    navigate("/add-employee"); // Redirect to the /form route
+    navigate("/add-asset"); // Redirect to the /form route for adding new assets
   };
 
   return (
     <Box m="20px">
-      {/* Wrap Header and Add New button in a Box */}
+      {/* Header and Add New button */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="TEAM" subtitle="Managing the Team Members" />
+        <Header title="ASSETS" subtitle="Managing the Assets" />
         <Box
           width="20%"
           p="5px"
@@ -90,10 +106,11 @@ const Team = () => {
           <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
             Add New
           </Typography>
-          <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
+          <Devices sx={{ color: colors.grey[100] }} />
         </Box>
       </Box>
 
+      {/* Data Grid */}
       <Box
         m="10px 0 0 0"
         height="75vh"
@@ -103,9 +120,6 @@ const Team = () => {
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
@@ -125,13 +139,14 @@ const Team = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={teamData.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={assetData.map((item, index) => ({ ...item, id: index + 1 }))}
           columns={columns}
-          loading={loading}
+                  loading={loading}
+                  onRowClick={handleRowClick}
         />
       </Box>
     </Box>
   );
 };
 
-export default Team;
+export default Asset;

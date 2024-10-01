@@ -16,6 +16,9 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import Login from "./scenes/login/Login";
+import Asset from "./scenes/asset";
+import AssetDetail from "./scenes/asset/AssetDetail";
+import AddAsset from "./scenes/form/AddAsset";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -38,14 +41,17 @@ function App() {
                   <div className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
                     <Sidebar isSidebar={isSidebarCollapsed} setIsSidebar={setIsSidebarCollapsed} />
                   </div>
-                  <main className="content">
+                  <main className="content" style={{marginBottom:"50px"}}>
                     <Topbar setIsSidebar={setIsSidebarCollapsed} />
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/team" element={<Team />} />
+                      <Route path="/asset" element={<Asset />} />
+                      <Route path="/asset/:assetId" element={<AssetDetail />} />
                       <Route path="/contacts" element={<Contacts />} />
                       <Route path="/invoices" element={<Invoices />} />
-                      <Route path="/form" element={<Form />} />
+                      <Route path="/add-employee" element={<Form />} />
+                      <Route path="/add-asset" element={<AddAsset />} />
                       <Route path="/bar" element={<Bar />} />
                       <Route path="/pie" element={<Pie />} />
                       <Route path="/line" element={<Line />} />
