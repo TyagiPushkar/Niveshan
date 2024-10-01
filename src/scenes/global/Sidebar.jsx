@@ -33,12 +33,16 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
+  // Retrieve user data from local storage
+  const userDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
+  const { Name, Role } = userDetails; // Destructure Name and Role from userDetails
+
   return (
     <Box
       sx={{
-        position: "fixed", // Ensure sidebar stays in a fixed position
-        height: "100vh", // Sidebar takes the full height of the viewport
-        zIndex: 1000, // Ensure the sidebar stays above the main content
+        position: "fixed",
+        height: "100vh",
+        zIndex: 1000,
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
@@ -58,7 +62,6 @@ const Sidebar = () => {
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
@@ -101,10 +104,10 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  User Name
+                  {Name} {/* Displaying user's name */}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Role
+                  {Role} {/* Displaying user's role */}
                 </Typography>
               </Box>
             </Box>
@@ -133,7 +136,7 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-             <Item
+            <Item
               title="Assets"
               to="/asset"
               icon={<Devices />}
