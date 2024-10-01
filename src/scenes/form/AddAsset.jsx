@@ -159,89 +159,114 @@ const AddAsset = () => {
                 {touched.assetName && errors.assetName && <div>{errors.assetName}</div>}
               </FormControl>
 
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Make"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.make}
-                name="make"
-                error={!!touched.make && !!errors.make}
-                helperText={touched.make && errors.make}
-                sx={{ gridColumn: "span 2" }}
-              />
+              {/* Conditional Fields for Hardware */}
+              {selectedAssetType === "Hardware" && (
+                <>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Make"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.make}
+                    name="make"
+                    error={!!touched.make && !!errors.make}
+                    helperText={touched.make && errors.make}
+                    sx={{ gridColumn: "span 2" }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Model" // New field
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.model}
-                name="model"
-                error={!!touched.model && !!errors.model}
-                helperText={touched.model && errors.model}
-                sx={{ gridColumn: "span 2" }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Model" // New field
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.model}
+                    name="model"
+                    error={!!touched.model && !!errors.model}
+                    helperText={touched.model && errors.model}
+                    sx={{ gridColumn: "span 2" }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Serial No."
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.serialNo}
-                name="serialNo"
-                error={!!touched.serialNo && !!errors.serialNo}
-                helperText={touched.serialNo && errors.serialNo}
-                sx={{ gridColumn: "span 2" }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Serial No."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.serialNo}
+                    name="serialNo"
+                    error={!!touched.serialNo && !!errors.serialNo}
+                    helperText={touched.serialNo && errors.serialNo}
+                    sx={{ gridColumn: "span 2" }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Hard Disk"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.harddisk}
-                name="harddisk"
-                error={!!touched.harddisk && !!errors.harddisk}
-                helperText={touched.harddisk && errors.harddisk}
-                sx={{ gridColumn: "span 2" }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="Hard Disk"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.harddisk}
+                    name="harddisk"
+                    error={!!touched.harddisk && !!errors.harddisk}
+                    helperText={touched.harddisk && errors.harddisk}
+                    sx={{ gridColumn: "span 2" }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="RAM"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.ram}
-                name="ram"
-                error={!!touched.ram && !!errors.ram}
-                helperText={touched.ram && errors.ram}
-                sx={{ gridColumn: "span 2" }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="RAM"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.ram}
+                    name="ram"
+                    error={!!touched.ram && !!errors.ram}
+                    helperText={touched.ram && errors.ram}
+                    sx={{ gridColumn: "span 2" }}
+                  />
 
-              <TextField
-                fullWidth
-                variant="filled"
-                type="number"
-                label="Quantity"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.quantity}
-                name="quantity"
-                error={!!touched.quantity && !!errors.quantity}
-                helperText={touched.quantity && errors.quantity}
-                sx={{ gridColumn: "span 2" }}
-              />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="number"
+                    label="Quantity"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.quantity}
+                    name="quantity"
+                    error={!!touched.quantity && !!errors.quantity}
+                    helperText={touched.quantity && errors.quantity}
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                </>
+              )}
+
+              {/* Conditional Fields for Software */}
+              {selectedAssetType === "Software" && (
+                <>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label="License Key" // Add specific fields for Software
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.licenseKey}
+                    name="licenseKey"
+                    error={!!touched.licenseKey && !!errors.licenseKey}
+                    helperText={touched.licenseKey && errors.licenseKey}
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                  {/* Add more software-specific fields here */}
+                </>
+              )}
 
               <TextField
                 fullWidth
@@ -317,12 +342,36 @@ const assetSchema = yup.object().shape({
   assetId: yup.string().required("Required"),
   assetType: yup.string().required("Required"),
   assetName: yup.string().required("Required"),
-  make: yup.string().required("Required"),
-  model: yup.string().required("Required"),
-  serialNo: yup.string().required("Required"),
-  harddisk: yup.string().required("Required"),
-  ram: yup.string().required("Required"),
-  quantity: yup.number().required("Required"),
+  make: yup.string().when("assetType", {
+    is: "Hardware",
+    then: yup.string().required("Required"),
+    otherwise: yup.string().notRequired(),
+  }),
+  model: yup.string().when("assetType", {
+    is: "Hardware",
+    then: yup.string().required("Required"),
+    otherwise: yup.string().notRequired(),
+  }),
+  serialNo: yup.string().when("assetType", {
+    is: "Hardware",
+    then: yup.string().required("Required"),
+    otherwise: yup.string().notRequired(),
+  }),
+  harddisk: yup.string().when("assetType", {
+    is: "Hardware",
+    then: yup.string().required("Required"),
+    otherwise: yup.string().notRequired(),
+  }),
+  ram: yup.string().when("assetType", {
+    is: "Hardware",
+    then: yup.string().required("Required"),
+    otherwise: yup.string().notRequired(),
+  }),
+  quantity: yup.number().when("assetType", {
+    is: "Hardware",
+    then: yup.number().required("Required"),
+    otherwise: yup.number().notRequired(),
+  }),
   invoiceNo: yup.string().required("Required"),
   invoiceDate: yup.date().required("Required"),
   vendorName: yup.string().required("Required"),
@@ -343,6 +392,7 @@ const initialValues = {
   invoiceDate: "",
   vendorName: "",
   invoiceAttach: "",
+  licenseKey: "", // New field for software
 };
 
 export default AddAsset;

@@ -39,7 +39,7 @@ const AssetDetail = () => {
 
   return (
     <Box m="20px">
-      <Header title={`${assetDetail.AssetType} - ${assetDetail.AssetName}`} subtitle="Detailed Information" />
+      <Header title={`${assetDetail.AssetName} - ${assetDetail.AssetId}`} subtitle="Detailed Information" />
 
       <Box mt="10px">
         <Grid container spacing={2}>

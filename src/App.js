@@ -19,6 +19,7 @@ import Login from "./scenes/login/Login";
 import Asset from "./scenes/asset";
 import AssetDetail from "./scenes/asset/AssetDetail";
 import AddAsset from "./scenes/form/AddAsset";
+import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute component
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -28,9 +29,8 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        
+
         <div className="app">
-          {/* Define routes and conditionally render Sidebar and Topbar */}
           <Routes>
             <Route path="/login" element={<Login />} />
             {/* All other routes render Sidebar and Topbar */}
@@ -41,23 +41,121 @@ function App() {
                   <div className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
                     <Sidebar isSidebar={isSidebarCollapsed} setIsSidebar={setIsSidebarCollapsed} />
                   </div>
-                  <main className="content" style={{marginBottom:"50px"}}>
+                  <main className="content" style={{ marginBottom: "50px" }}>
                     <Topbar setIsSidebar={setIsSidebarCollapsed} />
                     <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route path="/team" element={<Team />} />
-                      <Route path="/asset" element={<Asset />} />
-                      <Route path="/asset/:assetId" element={<AssetDetail />} />
-                      <Route path="/contacts" element={<Contacts />} />
-                      <Route path="/invoices" element={<Invoices />} />
-                      <Route path="/add-employee" element={<Form />} />
-                      <Route path="/add-asset" element={<AddAsset />} />
-                      <Route path="/bar" element={<Bar />} />
-                      <Route path="/pie" element={<Pie />} />
-                      <Route path="/line" element={<Line />} />
-                      <Route path="/faq" element={<FAQ />} />
-                      <Route path="/calendar" element={<Calendar />} />
-                      <Route path="/geography" element={<Geography />} />
+                      <Route 
+                        path="/" 
+                        element={
+                          <ProtectedRoute>
+                            <Dashboard />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/team" 
+                        element={
+                          <ProtectedRoute>
+                            <Team />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/asset" 
+                        element={
+                          <ProtectedRoute>
+                            <Asset />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/asset/:assetId" 
+                        element={
+                          <ProtectedRoute>
+                            <AssetDetail />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/contacts" 
+                        element={
+                          <ProtectedRoute>
+                            <Contacts />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/invoices" 
+                        element={
+                          <ProtectedRoute>
+                            <Invoices />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/add-employee" 
+                        element={
+                          <ProtectedRoute>
+                            <Form />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/add-asset" 
+                        element={
+                          <ProtectedRoute>
+                            <AddAsset />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/bar" 
+                        element={
+                          <ProtectedRoute>
+                            <Bar />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/pie" 
+                        element={
+                          <ProtectedRoute>
+                            <Pie />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/line" 
+                        element={
+                          <ProtectedRoute>
+                            <Line />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/faq" 
+                        element={
+                          <ProtectedRoute>
+                            <FAQ />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/calendar" 
+                        element={
+                          <ProtectedRoute>
+                            <Calendar />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/geography" 
+                        element={
+                          <ProtectedRoute>
+                            <Geography />
+                          </ProtectedRoute>
+                        } 
+                      />
                     </Routes>
                   </main>
                 </>

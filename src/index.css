@@ -19,17 +19,14 @@ body,
   width: 10px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   background: #e0e0e0;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
   background: #888;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
@@ -37,24 +34,27 @@ body,
 .app {
   display: flex;
   height: 100vh;
-  /* Make sure the app fills the whole viewport height */
 }
 
 .sidebar {
   flex: 0 0 250px;
-  /* Fixed width for the expanded sidebar */
   transition: all 0.3s ease;
 }
 
 .sidebar.collapsed {
   flex: 0 0 80px;
-  /* Adjusted width for collapsed sidebar */
 }
 
 .content {
   flex-grow: 1;
-  /* Take up the remaining space */
   padding: 20px;
-  /* Add padding for the content */
   transition: all 0.3s ease;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
 }
