@@ -8,6 +8,8 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Devices } from "@mui/icons-material";
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -114,35 +116,58 @@ const Sidebar = () => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
+            {/* Public Route */}
+           
+
+            {/* Admin-Only Routes */}
+            {Role === "Admin" && (
+
+              <>
+                 <Item
               title="Dashboard"
-              to="/"
+              to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Manage
-            </Typography>
-            <Item
-              title="Team"
-              to="/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Assets"
-              to="/asset"
-              icon={<Devices />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+                <Typography
+                  variant="h6"
+                  color={colors.grey[300]}
+                  sx={{ m: "15px 0 5px 20px" }}
+                >
+                  Manage
+                </Typography>
+                <Item
+                  title="Team"
+                  to="/team"
+                  icon={<PeopleOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+                <Item
+                  title="Assets"
+                  to="/asset"
+                  icon={<Devices />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+                <Item
+                  title="Issue Asset"
+                  to="/issue-asset"
+                  icon={<FormatListNumberedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+               
+              </>
+            )}
+             <Item
+                  title="Support Ticket"
+                  to="/support-ticket"
+                  icon={<LiveHelpIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
           </Box>
         </Menu>
       </ProSidebar>

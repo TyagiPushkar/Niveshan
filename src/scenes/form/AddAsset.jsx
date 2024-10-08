@@ -98,63 +98,37 @@ const AddAsset = () => {
   const handleFileChange = (event) => {
     setFormValues({ ...formValues, invoiceAttach: event.target.files[0] });
   };
-
- const handleFormSubmit = async () => {
- 
-  // Log the current form values for debugging
-  console.log("Current Form Values: ", formValues);
-
+   
+  const handleFormSubmit = async () => {
   try {
     setLoading(true);
 
-    // Prepare JSON payload, including assetType
-    const jsonData = {
-      AssetType: formValues.assetType,  // Ensure assetType is included
-      AssetName: formValues.assetName,
-      AssetCondition: formValues.assetCondition || "New",
-      Make: formValues.make || "",
-      Model: formValues.model || "",
-      SerialNo: formValues.serialNo || "",
-      Harddisk: formValues.harddisk || "",
-      RAM: formValues.ram || "",
-      Quantity: formValues.quantity || "",
-      InvoiceNo: formValues.invoiceNo || "",
-      InvoiceDate: formValues.invoiceDate || "",
-      VendorName: formValues.vendorName || "",
-      InvoiceAttach: null,
-      Status: formValues.status || "In stock",
-    };
+    const formData = new FormData();
+    formData.append("AssetType", formValues.assetType);
+    formData.append("AssetName", formValues.assetName);
+    formData.append("AssetCondition", formValues.assetCondition || "New");
+    formData.append("Make", formValues.make || "");
+    formData.append("Model", formValues.model || "");
+    formData.append("SerialNo", formValues.serialNo || "");
+    formData.append("Harddisk", formValues.harddisk || "");
+    formData.append("RAM", formValues.ram || "");
+    formData.append("Quantity", formValues.quantity || "");
+    formData.append("InvoiceNo", formValues.invoiceNo || "");
+    formData.append("InvoiceDate", formValues.invoiceDate || "");
+    formData.append("VendorName", formValues.vendorName || "");
+    // if (formValues.invoiceAttach) {
+    //   formData.append("InvoiceAttach", formValues.invoiceAttach);
+    // }
+    formData.append("Status", formValues.status || "In stock");
 
-    // Log the JSON payload to the console
-    console.log("Submitting JSON Payload:", jsonData);
-
-    // Send the payload as JSON
-    const response = await axios.post("https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php", jsonData, {
+    const response = await axios.post("https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php", formData, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data", // Use FormData
       },
     });
 
     console.log("API Response:", response.data);
-    if (response.data) {
-      alert(response.data.message);
-      setFormValues({
-        assetType: "",
-        assetName: "",
-        assetCondition: "New",
-        make: "",
-        model: "",
-        serialNo: "",
-        harddisk: "",
-        ram: "",
-        quantity: "",
-        invoiceNo: "",
-        invoiceDate: "",
-        vendorName: "",
-        invoiceAttach: null,
-        status: "In stock",
-      });
-    }
+    alert(response.data.message);
   } catch (error) {
     console.error("Error adding asset:", error);
     alert("Failed to add asset");
@@ -162,7 +136,6 @@ const AddAsset = () => {
     setLoading(false);
   }
 };
-
 
 
   return (
@@ -189,9 +162,6 @@ const AddAsset = () => {
     <MenuItem value="Software">Software</MenuItem>
   </Select>
 </FormControl>
-
-
-
         <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
           <InputLabel id="asset-name-label">Asset Name</InputLabel>
           <Select

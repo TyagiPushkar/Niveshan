@@ -32,6 +32,9 @@ const Topbar = () => {
     localStorage.clear(); // Clear local storage
     navigate("/login"); // Redirect to login
   };
+  const handleProfile = () => {
+    navigate("/"); // Redirect to login
+  };
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -68,6 +71,7 @@ const Topbar = () => {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
+          <MenuItem onClick={handleProfile}>Profile</MenuItem>
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
       </Box>

@@ -20,6 +20,13 @@ import Asset from "./scenes/asset";
 import AssetDetail from "./scenes/asset/AssetDetail";
 import AddAsset from "./scenes/form/AddAsset";
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute component
+import EmployeeDetails from "./scenes/team/EmployeeDetails";
+import IssueAsset from "./scenes/asset/IssueAsset";
+import IssuedAssets from "./scenes/asset/IssuedAssets";
+import Support from "./scenes/support";
+import RaiseTicket from "./scenes/support/RaiseTicket";
+import TicketDetail from "./scenes/support/TicketDetail";
+import Profile from "./scenes/team/Profile";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -32,7 +39,9 @@ function App() {
 
         <div className="app">
           <Routes>
+            {/* Public Route: Login Page */}
             <Route path="/login" element={<Login />} />
+
             {/* All other routes render Sidebar and Topbar */}
             <Route
               path="*"
@@ -44,26 +53,38 @@ function App() {
                   <main className="content" style={{ marginBottom: "50px" }}>
                     <Topbar setIsSidebar={setIsSidebarCollapsed} />
                     <Routes>
+                      {/* Public Routes */}
+                      <Route 
+                        path="/dashboard" 
+                        element={
+                          <ProtectedRoute adminOnly>
+                            <Dashboard />
+                          </ProtectedRoute>
+                        } 
+                      />
                       <Route 
                         path="/" 
                         element={
                           <ProtectedRoute>
-                            <Dashboard />
+                            <Profile />
                           </ProtectedRoute>
                         } 
                       />
                       <Route 
                         path="/team" 
                         element={
-                          <ProtectedRoute>
+                          <ProtectedRoute adminOnly>
                             <Team />
                           </ProtectedRoute>
                         } 
                       />
+                      <Route path="/employee/:EmpId" element={<ProtectedRoute adminOnly><EmployeeDetails /></ProtectedRoute>} />
+
+                      {/* Admin-Only Routes */}
                       <Route 
                         path="/asset" 
                         element={
-                          <ProtectedRoute>
+                          <ProtectedRoute adminOnly>
                             <Asset />
                           </ProtectedRoute>
                         } 
@@ -71,31 +92,48 @@ function App() {
                       <Route 
                         path="/asset/:assetId" 
                         element={
-                          <ProtectedRoute>
+                          <ProtectedRoute adminOnly>
                             <AssetDetail />
                           </ProtectedRoute>
                         } 
                       />
                       <Route 
-                        path="/contacts" 
+                        path="/issue-asset" 
                         element={
-                          <ProtectedRoute>
-                            <Contacts />
+                          <ProtectedRoute adminOnly>
+                            <IssuedAssets />
                           </ProtectedRoute>
                         } 
                       />
                       <Route 
-                        path="/invoices" 
+                        path="/issue-new-asset" 
                         element={
-                          <ProtectedRoute>
-                            <Invoices />
+                          <ProtectedRoute adminOnly>
+                            <IssueAsset />
                           </ProtectedRoute>
                         } 
                       />
+                      <Route 
+                        path="/support-ticket" 
+                        element={
+                          <ProtectedRoute>
+                            <Support />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/raise-ticket" 
+                        element={
+                          <ProtectedRoute>
+                            <RaiseTicket />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route path="/support/:id" element={<TicketDetail />} />
                       <Route 
                         path="/add-employee" 
                         element={
-                          <ProtectedRoute>
+                          <ProtectedRoute adminOnly>
                             <Form />
                           </ProtectedRoute>
                         } 
@@ -103,56 +141,8 @@ function App() {
                       <Route 
                         path="/add-asset" 
                         element={
-                          <ProtectedRoute>
+                          <ProtectedRoute adminOnly>
                             <AddAsset />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/bar" 
-                        element={
-                          <ProtectedRoute>
-                            <Bar />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/pie" 
-                        element={
-                          <ProtectedRoute>
-                            <Pie />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/line" 
-                        element={
-                          <ProtectedRoute>
-                            <Line />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/faq" 
-                        element={
-                          <ProtectedRoute>
-                            <FAQ />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/calendar" 
-                        element={
-                          <ProtectedRoute>
-                            <Calendar />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/geography" 
-                        element={
-                          <ProtectedRoute>
-                            <Geography />
                           </ProtectedRoute>
                         } 
                       />

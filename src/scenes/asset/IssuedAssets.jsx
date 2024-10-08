@@ -1,82 +1,66 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
+import { Devices } from "@mui/icons-material";
 
-const Team = () => {
+const IssuedAssets = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
-  const [teamData, setTeamData] = useState([]);
+  const [issuedAssets, setIssuedAssets] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate()
   // Fetch data from the API
   useEffect(() => {
-    const fetchTeamData = async () => {
+    const fetchIssuedAssets = async () => {
       try {
-        const response = await fetch(
-          "https://namami-infotech.com/NiveshanBackend/api/users/get_users.php"
-        );
+        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/assets/get_asset_issue.php");
         const data = await response.json();
-        setTeamData(data.records); // Assuming the data is under "records"
+        setIssuedAssets(data.records); // Assuming the issued assets data is under "records"
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching team data:", error);
+        console.error("Error fetching issued assets:", error);
         setLoading(false);
       }
     };
 
-    fetchTeamData();
+    fetchIssuedAssets();
   }, []);
 
   const columns = [
-    { field: "EmpId", headerName: "EmpId", width: 100 },
-    {
-      field: "Name",
-      headerName: "Name",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "Mobile",
-      headerName: "Mobile",
-      flex: 1,
-    },
-    {
-      field: "Email",
-      headerName: "Email",
-      flex: 1,
-    },
-    {
-      field: "Role",
-      headerName: "Role",
-      flex: 1,
-    },
+    { field: "EmpId", headerName: "Employee ID", width: 150 },
+    { field: "AssetID", headerName: "Asset ID", width: 150 },
     {
       field: "Status",
       headerName: "Status",
+      width: 120,
+    },
+    {
+      field: "Remark",
+      headerName: "Remark",
       flex: 1,
     },
     {
-      field: "DateOfJoining",
-      headerName: "Date of Joining",
-      flex: 1,
+      field: "IssueDate",
+      headerName: "Issue Date",
+      width: 180,
+    },
+    {
+      field: "AcceptedDate",
+      headerName: "Accepted Date",
+      width: 180,
     },
   ];
-
-  // Handle row click to redirect to the employee details page
-  const handleRowClick = (params) => {
-    navigate(`/employee/${params.row.EmpId}`); // Redirect to employee details route
+const handleRedirect = () => {
+    navigate("/issue-new-asset"); // Redirect to the /form route for adding new assets
   };
-
   return (
     <Box m="20px">
-      {/* Wrap Header and Add New button in a Box */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="TEAM" subtitle="Managing the Team Members" />
+      {/* Header */}
+       <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Header title="ISSUED ASSETS" subtitle="List of Issued Assets" />
         <Box
           width="20%"
           p="5px"
@@ -85,15 +69,15 @@ const Team = () => {
           backgroundColor={colors.greenAccent[600]}
           borderRadius="4px"
           sx={{ cursor: "pointer" }}
-          onClick={() => navigate("/add-employee")}
+          onClick={handleRedirect}
         >
           <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
-            Add New
+            Issue Asset
           </Typography>
-          <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
+          <Devices sx={{ color: colors.grey[100] }} />
         </Box>
-      </Box>
-
+        </Box>
+      {/* Data Grid */}
       <Box
         m="10px 0 0 0"
         height="75vh"
@@ -103,9 +87,6 @@ const Team = () => {
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
@@ -124,15 +105,13 @@ const Team = () => {
         }}
       >
         <DataGrid
-          checkboxSelection
-          rows={teamData.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={issuedAssets.map((item, index) => ({ ...item, id: index + 1 }))}
           columns={columns}
           loading={loading}
-          onRowClick={handleRowClick} // Add row click handler
         />
       </Box>
     </Box>
   );
 };
 
-export default Team;
+export default IssuedAssets;

@@ -1,102 +1,79 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import Devices from "@mui/icons-material/Devices";
-import FormatListNumberedIcon from "@mui/icons-material/Devices";
 import Header from "../../components/Header";
 
-const Asset = () => {
+const Support = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
-  const [assetData, setAssetData] = useState([]);
+  const [ticketData, setTicketData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch data from the API
   useEffect(() => {
-    const fetchAssetData = async () => {
+    const fetchTicketData = async () => {
       try {
-        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php");
+        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php");
         const data = await response.json();
-        setAssetData(data.data); // Assuming the assets data is under "data"
+        setTicketData(data); // Assuming the tickets data is returned as an array
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching asset data:", error);
+        console.error("Error fetching ticket data:", error);
         setLoading(false);
       }
     };
 
-    fetchAssetData();
+    fetchTicketData();
   }, []);
 
   const columns = [
-    { field: "AssetId", headerName: "Asset ID", width: 120 },
+    { field: "id", headerName: "Ticket ID", width: 120 },
     {
-      field: "AssetType",
-      headerName: "Type",
+      field: "EmpId",
+      headerName: "Employee ID",
+      width: 150,
+    },
+    {
+      field: "Category",
+      headerName: "Category",
       flex: 1,
     },
-    {
-      field: "AssetName",
-      headerName: "Name",
-      flex: 1,
-    },
-    {
-      field: "AssetCondition",
-      headerName: "Condition",
-      flex: 1,
-    },
-    {
-      field: "Make",
-      headerName: "Make",
-      flex: 1,
-    },
-    {
-      field: "Model",
-      headerName: "Model",
-      flex: 1,
-    },
-    {
-      field: "SerialNo",
-      headerName: "S/No.",
-      flex: 1,
-    },
-    
-    {
-      field: "Quantity",
-      headerName: "Qty",
-      type: "number",
-      width: 100,
-    },
-    
-    {
-      field: "VendorName",
-      headerName: "Vendor",
-      flex: 1,
-    },
+   
+   
     {
       field: "Status",
       headerName: "Status",
       flex: 1,
     },
+    {
+      field: "DateTime",
+      headerName: "Date Created",
+      flex: 1,
+    },
+    {
+      field: "UpdateDateTime",
+      headerName: "Last Updated",
+      flex: 1,
+    },
   ];
- const handleRowClick = (params) => {
-    navigate(`/asset/${params.row.AssetId}`); // Navigating to the detail page with AssetId
+
+  const handleRowClick = (params) => {
+    navigate(`/support/${params.row.id}`); // Navigating to the detail page with Ticket ID
   };
-  const handleRedirect = () => {
-    navigate("/add-asset"); // Redirect to the /form route for adding new assets
-  };
-  const handleRedirect1 = () => {
-    navigate("/issue-asset"); // Redirect to the /form route for adding new assets
+
+  const handleCreateTicket = () => {
+    navigate("/raise-ticket"); // Redirect to the form route for adding a new support ticket
   };
 
   return (
     <Box m="20px">
       {/* Header and Add New button */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="ASSETS" subtitle="Managing the Assets" />
+        <Header title="Support Tickets" subtitle="Managing Support Tickets" />
         <Box
           width="20%"
           p="5px"
@@ -105,17 +82,15 @@ const Asset = () => {
           backgroundColor={colors.greenAccent[600]}
           borderRadius="4px"
           sx={{ cursor: "pointer" }}
-          onClick={handleRedirect}
+          onClick={handleCreateTicket}
         >
           <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
-            Add New
+            Raise Ticket
           </Typography>
           <Devices sx={{ color: colors.grey[100] }} />
         </Box>
-        
       </Box>
 
-      {/* Data Grid */}
       <Box
         m="10px 0 0 0"
         height="75vh"
@@ -144,14 +119,14 @@ const Asset = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={assetData.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={ticketData} // Use the actual ticket data
           columns={columns}
-                  loading={loading}
-                  onRowClick={handleRowClick}
+          loading={loading}
+          onRowClick={handleRowClick}
         />
       </Box>
     </Box>
   );
 };
 
-export default Asset;
+export default Support;

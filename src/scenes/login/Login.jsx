@@ -34,7 +34,7 @@ const Login = () => {
           Email: data.Email,
           Role: data.Role,
         }));
-        navigate('/'); // Redirect to dashboard
+        navigate('/dashboard'); // Redirect to dashboard
       } else {
         // Handle errors from the server
         console.error('Login failed:', data.message);
