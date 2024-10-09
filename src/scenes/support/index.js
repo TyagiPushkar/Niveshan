@@ -13,11 +13,22 @@ const Support = () => {
   const [ticketData, setTicketData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch user details from localStorage
+  const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+  const isAdmin = userDetails?.Role === 'Admin';
+  const empId = userDetails?.EmpId;
+
   // Fetch data from the API
   useEffect(() => {
     const fetchTicketData = async () => {
       try {
-        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php");
+        let url = "https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php";
+        if (!isAdmin) {
+          // If not admin, fetch only the tickets for the specific employee
+          url += `?EmpId=${empId}`;
+        }
+
+        const response = await fetch(url);
         const data = await response.json();
         setTicketData(data); // Assuming the tickets data is returned as an array
         setLoading(false);
@@ -28,7 +39,7 @@ const Support = () => {
     };
 
     fetchTicketData();
-  }, []);
+  }, [isAdmin, empId]);
 
   const columns = [
     { field: "id", headerName: "Ticket ID", width: 120 },
@@ -42,8 +53,6 @@ const Support = () => {
       headerName: "Category",
       flex: 1,
     },
-   
-   
     {
       field: "Status",
       headerName: "Status",

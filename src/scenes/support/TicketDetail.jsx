@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, useTheme } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 
@@ -8,10 +8,14 @@ const TicketDetail = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { id } = useParams(); // Get the ticket ID from URL parameters
+  const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch user details from local storage
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  
   // Fetch ticket details based on ticket ID
   useEffect(() => {
     const fetchTicketDetail = async () => {
@@ -20,7 +24,12 @@ const TicketDetail = () => {
         const data = await response.json();
 
         if (response.ok) {
-          setTicket(data);
+          // If the user is not an admin and this ticket doesn't belong to them, show an error or redirect
+          if (userDetails.Role !== "Admin" && data.EmpId !== userDetails.EmpId) {
+            setError("You are not authorized to view this ticket.");
+          } else {
+            setTicket(data);
+          }
         } else {
           setError(data.message || "Error fetching ticket details");
         }
@@ -32,7 +41,7 @@ const TicketDetail = () => {
     };
 
     fetchTicketDetail();
-  }, [id]);
+  }, [id, userDetails.EmpId, userDetails.Role]);
 
   if (loading) {
     return <Typography>Loading...</Typography>;
@@ -60,7 +69,7 @@ const TicketDetail = () => {
         <Typography variant="h6">Date Created: {new Date(ticket.DateTime).toLocaleString()}</Typography>
         <Typography variant="h6">Last Updated: {new Date(ticket.UpdateDateTime).toLocaleString()}</Typography>
       </Box>
-      
+
       <Box mt="20px">
         {ticket.Image && (
           <Button
