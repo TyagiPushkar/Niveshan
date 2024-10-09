@@ -9,6 +9,7 @@ import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
 import StatBox from "../../components/StatBox";
 import PieChart from "../../components/PieChart";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -21,6 +22,7 @@ const Dashboard = () => {
   });
   const [selectedAssetName, setSelectedAssetName] = useState("");
   const [pieChartData, setPieChartData] = useState([]);
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -116,8 +118,6 @@ const Dashboard = () => {
           <StatBox
             title={dashboardData.ticketStats.totalTickets || 0}
             subtitle="Total Tickets"
-           
-          
             icon={<EmailIcon sx={{ color: colors.greenAccent[600] }} />}
           />
         </Box>
@@ -125,8 +125,6 @@ const Dashboard = () => {
           <StatBox
             title={dashboardData.assetStats.liveAssets || 0}
             subtitle="Live Assets"
-         
-           
             icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600] }} />}
           />
         </Box>
@@ -134,8 +132,6 @@ const Dashboard = () => {
           <StatBox
             title={dashboardData.assetStats.retiredAssets || 0}
             subtitle="Retired Assets"
-            progress="0.30"
-            increase="+5%"
             icon={<PersonAddIcon sx={{ color: colors.greenAccent[600] }} />}
           />
         </Box>
@@ -143,8 +139,6 @@ const Dashboard = () => {
           <StatBox
             title={dashboardData.assetStats.inStockAssets || 0}
             subtitle="In-Stock Assets"
-            progress="0.80"
-            increase="+43%"
             icon={<TrafficIcon sx={{ color: colors.greenAccent[600] }} />}
           />
         </Box>
@@ -211,7 +205,13 @@ const Dashboard = () => {
                 </Typography>
               </Box>
               <Box color={colors.grey[100]}>{transaction.DateTime}</Box>
-              <Box backgroundColor={colors.greenAccent[500]} p="5px 10px" borderRadius="4px">
+              <Box 
+                backgroundColor={colors.greenAccent[500]} 
+                p="5px 10px" 
+                borderRadius="4px"
+                onClick={() => navigate(`/support/${transaction.id}`)} // Navigate to the ticket details
+                sx={{ cursor: 'pointer' }} // Change cursor to pointer
+              >
                 {transaction.Status}
               </Box>
             </Box>
