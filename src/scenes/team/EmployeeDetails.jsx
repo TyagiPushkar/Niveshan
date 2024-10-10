@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -80,8 +80,10 @@ const EmployeeDetails = () => {
             p="20px"
             backgroundColor={colors.primary[400]}
             borderRadius="8px"
-          >
-            {assetsData.map((asset, index) => (
+                      >
+                          <Grid container spacing={3}>
+                          {assetsData.map((asset, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
               <Box key={index} mb="15px" p="10px" backgroundColor={colors.blueAccent[700]} borderRadius="8px">
                 <Typography variant="subtitle1">Asset ID: {asset.AssetID}</Typography>
                 <Typography variant="subtitle1">Asset Name: {asset.AssetName}</Typography>
@@ -89,8 +91,10 @@ const EmployeeDetails = () => {
                 <Typography variant="subtitle1">Issue Date: {asset.IssueDate}</Typography>
                 <Typography variant="subtitle1">Accepted Date: {asset.AcceptedDate}</Typography>
                 <Typography variant="subtitle1">Remark: {asset.Remark}</Typography>
-              </Box>
-            ))}
+                                  </Box>
+                                  </Grid>
+                          ))}
+                              </Grid>
           </Box>
         ) : (
           <Typography>No assets issued to this employee.</Typography>

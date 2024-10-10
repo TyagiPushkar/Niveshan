@@ -143,7 +143,7 @@ const Dashboard = () => {
           />
         </Box>
 
-        <Box gridColumn="span 8" gridRow="span 2" backgroundColor={colors.primary[400]}>
+        <Box gridColumn="span 8" gridRow="span 3" backgroundColor={colors.primary[400]}>
           <Box mt="25px" p="0 30px" display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
@@ -153,10 +153,10 @@ const Dashboard = () => {
                 value={selectedAssetName}
                 onChange={handleAssetNameChange}
                 displayEmpty
-                sx={{
-                  color: colors.grey[100],
-                  bgcolor: colors.primary[500]
-                }}
+                // sx={{
+                //   color: colors.grey[100],
+                //   bgcolor: colors.primary[500]
+                // }}
               >
                 <MenuItem value="" disabled>Select Asset Name</MenuItem>
                 {assetNames.length > 0 ? (
@@ -176,15 +176,15 @@ const Dashboard = () => {
               </IconButton>
             </Box>
           </Box>
-          <Box height="240px" m="-20px 0 0 0">
+          <Box height="300px" m="-20px 0 0 0">
             <PieChart pieData={pieChartData} />
           </Box>
         </Box>
 
-        <Box gridColumn="span 4" gridRow="span 2" backgroundColor={colors.primary[400]} overflow="auto">
+        <Box gridColumn="span 4" gridRow="span 3" backgroundColor={colors.primary[400]} overflow="auto">
           <Box display="flex" justifyContent="space-between" alignItems="center" borderBottom={`4px solid ${colors.primary[500]}`} colors={colors.grey[100]} p="15px">
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Tickets
+              Open Tickets
             </Typography>
           </Box>
           {dashboardData.ticketDetails.map((transaction, i) => (
@@ -201,7 +201,7 @@ const Dashboard = () => {
                   {transaction.id}
                 </Typography>
                 <Typography color={colors.grey[100]}>
-                  {transaction.Remark}
+                  {transaction.Category}
                 </Typography>
               </Box>
               <Box color={colors.grey[100]}>{transaction.DateTime}</Box>

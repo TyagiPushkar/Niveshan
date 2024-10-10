@@ -27,6 +27,7 @@ import Support from "./scenes/support";
 import RaiseTicket from "./scenes/support/RaiseTicket";
 import TicketDetail from "./scenes/support/TicketDetail";
 import Profile from "./scenes/team/Profile";
+import Report from "./scenes/report/Report";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -143,6 +144,14 @@ function App() {
                         element={
                           <ProtectedRoute adminOnly>
                             <AddAsset />
+                          </ProtectedRoute>
+                        } 
+                      />
+                       <Route 
+                        path="/reports" 
+                        element={
+                          <ProtectedRoute adminOnly>
+                          <Report/>
                           </ProtectedRoute>
                         } 
                       />

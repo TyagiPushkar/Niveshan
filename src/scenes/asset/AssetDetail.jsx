@@ -86,6 +86,9 @@ const AssetDetail = () => {
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Invoice Date: {assetDetail.InvoiceDate}</Typography>
           </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6">Warranty: {assetDetail.Warranty}</Typography>
+          </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Added On: {assetDetail.AddDateTime}</Typography>
           </Grid>

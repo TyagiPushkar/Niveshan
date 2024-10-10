@@ -10,7 +10,8 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Devices } from "@mui/icons-material";
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
-
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import SummarizeIcon from '@mui/icons-material/Summarize';
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -122,14 +123,24 @@ const Sidebar = () => {
             {/* Admin-Only Routes */}
             {Role === "Admin" && (
 
-              <>
-                 <Item
+              
+              <Item
               title="Dashboard"
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+                />
+            )}
+             <Item
+                  title="Profile"
+                  to="/"
+                  icon={<PersonOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+            {Role === "Admin" && (
+              <>
                 <Typography
                   variant="h6"
                   color={colors.grey[300]}
@@ -158,6 +169,13 @@ const Sidebar = () => {
                   selected={selected}
                   setSelected={setSelected}
                 />
+                 <Item
+                  title="Reports"
+                  to="/reports"
+                  icon={<SummarizeIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
                
               </>
             )}
@@ -167,7 +185,8 @@ const Sidebar = () => {
                   icon={<LiveHelpIcon />}
                   selected={selected}
                   setSelected={setSelected}
-                />
+            />
+            
           </Box>
         </Menu>
       </ProSidebar>
