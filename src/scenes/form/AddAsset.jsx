@@ -13,22 +13,21 @@ const AddAsset = () => {
   const [loading, setLoading] = useState(false);
   
   const [formValues, setFormValues] = useState({
-  assetType: "",  // Ensure this is initialized correctly
-  assetName: "",
-  assetCondition: "New",
-  make: "",
-  model: "",
-  serialNo: "",
-  harddisk: "",
-  ram: "",
-  quantity: "",
-  invoiceNo: "",
-  invoiceDate: "",
-  vendorName: "",
-  invoiceAttach: null,
-  status: "In stock",
-});
-
+    assetType: "",
+    assetName: "",
+    assetCondition: "New",
+    make: "",
+    model: "",
+    serialNo: "",
+    harddisk: "",
+    ram: "",
+    quantity: "",
+    invoiceNo: "",
+    invoiceDate: "",
+    vendorName: "",
+    invoiceAttach: null,
+    status: "In stock",
+  });
 
   useEffect(() => {
     const fetchAssetNames = async () => {
@@ -36,7 +35,7 @@ const AddAsset = () => {
         const response = await axios.get("https://namami-infotech.com/NiveshanBackend/api/assets/get_asset_names.php");
         if (response.data.data && Array.isArray(response.data.data)) {
           setAssetNames(response.data.data);
-          setFilteredAssetNames(response.data.data); // Initially set all asset names
+          setFilteredAssetNames(response.data.data);
         }
       } catch (error) {
         console.error("Error fetching asset names:", error);
@@ -50,6 +49,7 @@ const AddAsset = () => {
       const response = await axios.get(`https://namami-infotech.com/NiveshanBackend/api/assets/get_checkpoints.php?checkpoints=${checkpoints.join(',')}`);
       if (response.data.data && Array.isArray(response.data.data)) {
         setFieldNames(response.data.data);
+        
       } else {
         setFieldNames([]);
       }
@@ -59,24 +59,21 @@ const AddAsset = () => {
     }
   };
 
- const handleAssetTypeChange = (event) => {
-  const assetType = event.target.value;  // Get the selected value
-  setFormValues((prevValues) => ({
-    ...prevValues,
-    assetType,  // Update only assetType in state
-  }));
+  const handleAssetTypeChange = (event) => {
+    const assetType = event.target.value;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      assetType,
+    }));
 
-  // Filter asset names based on the selected asset type
-  const filteredAssets = assetNames.filter(asset => asset.type === assetType);
-  setFilteredAssetNames(filteredAssets);
-  setFormValues((prevValues) => ({
-    ...prevValues,
-    assetName: "", // Reset asset name when type changes
-  }));
-  setFieldNames([]); // Reset field names
-};
-
-
+    const filteredAssets = assetNames.filter(asset => asset.type === assetType);
+    setFilteredAssetNames(filteredAssets);
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      assetName: "",
+    }));
+    setFieldNames([]);
+  };
 
   const handleAssetNameChange = async (event) => {
     const selectedAsset = assetNames.find(asset => asset.name === event.target.value);
@@ -98,34 +95,37 @@ const AddAsset = () => {
   const handleFileChange = (event) => {
     setFormValues({ ...formValues, invoiceAttach: event.target.files[0] });
   };
-   
+
   const handleFormSubmit = async () => {
   try {
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("AssetType", formValues.assetType);
-    formData.append("AssetName", formValues.assetName);
-    formData.append("AssetCondition", formValues.assetCondition || "New");
-    formData.append("Make", formValues.make || "");
-    formData.append("Model", formValues.model || "");
-    formData.append("SerialNo", formValues.serialNo || "");
-    formData.append("Harddisk", formValues.harddisk || "");
-    formData.append("RAM", formValues.ram || "");
-    formData.append("Quantity", formValues.quantity || "");
-    formData.append("InvoiceNo", formValues.invoiceNo || "");
-    formData.append("InvoiceDate", formValues.invoiceDate || "");
-    formData.append("VendorName", formValues.vendorName || "");
-    // if (formValues.invoiceAttach) {
-    //   formData.append("InvoiceAttach", formValues.invoiceAttach);
-    // }
-    formData.append("Status", formValues.status || "In stock");
+    // Create an object to hold the form values
+    const payload = {
+      AssetType: formValues.assetType || "",
+      AssetName: formValues.assetName || "",
+      AssetCondition: formValues.assetCondition || "New",
+      Status: formValues.status || "In stock",
+    };
 
-    const response = await axios.post("https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data", // Use FormData
-      },
+    // Append only the fields that come from checkpoints
+    fieldNames.forEach((field) => {
+      const fieldValue = formValues[field.field_name] || "";
+      payload[field.field_name] = fieldValue;
     });
+
+    console.log("Payload being sent:", payload);
+
+    // Make the API request using axios with JSON
+    const response = await axios.post(
+      "https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php",
+      payload, // Sending as JSON
+      {
+        headers: {
+          "Content-Type": "application/json", // Set content type to JSON
+        },
+      }
+    );
 
     console.log("API Response:", response.data);
     alert(response.data.message);
@@ -136,6 +136,9 @@ const AddAsset = () => {
     setLoading(false);
   }
 };
+
+
+
 
 
   return (
@@ -150,18 +153,19 @@ const AddAsset = () => {
           "& > div": { gridColumn: isNonMobile ? undefined : "span 2" },
         }}
       >
-      <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
-  <InputLabel id="asset-type-label">Asset Type</InputLabel>
-  <Select
-    labelId="asset-type-label"
-    name="assetType"
-    value={formValues.assetType} // This should correctly reflect the state
-    onChange={handleAssetTypeChange} // Ensure this is the correct handler
-  >
-    <MenuItem value="Hardware">Hardware</MenuItem>
-    <MenuItem value="Software">Software</MenuItem>
-  </Select>
-</FormControl>
+        <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+          <InputLabel id="asset-type-label">Asset Type</InputLabel>
+          <Select
+            labelId="asset-type-label"
+            name="assetType"
+            value={formValues.assetType}
+            onChange={handleAssetTypeChange}
+          >
+            <MenuItem value="Hardware">Hardware</MenuItem>
+            <MenuItem value="Software">Software</MenuItem>
+          </Select>
+        </FormControl>
+
         <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
           <InputLabel id="asset-name-label">Asset Name</InputLabel>
           <Select
@@ -178,7 +182,6 @@ const AddAsset = () => {
           </Select>
         </FormControl>
 
-        {/* Conditional Fields */}
         {fieldNames.length > 0 && fieldNames.map(field => (
           <TextField
             key={field.id}
