@@ -75,17 +75,7 @@ const AddAsset = () => {
     setFieldNames([]);
   };
 
-  const handleAssetNameChange = async (event) => {
-    const selectedAsset = assetNames.find(asset => asset.name === event.target.value);
-    setSelectedAssetId(selectedAsset.id);
-    if (selectedAsset.checkpoints) {
-      const checkpoints = selectedAsset.checkpoints.split(',').map(id => parseInt(id, 10));
-      await fetchFieldNames(checkpoints);
-    } else {
-      setFieldNames([]);
-    }
-    setFormValues({ ...formValues, assetName: event.target.value });
-  };
+ 
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -96,14 +86,35 @@ const AddAsset = () => {
     setFormValues({ ...formValues, invoiceAttach: event.target.files[0] });
   };
 
-  const handleFormSubmit = async () => {
+  const handleAssetNameChange = async (event) => {
+  const selectedAsset = assetNames.find(asset => asset.name === event.target.value);
+  setFormValues({ ...formValues, assetName: event.target.value });
+
+  // Ensure that the selectedAsset exists before accessing its properties
+  if (selectedAsset) {
+    setSelectedAssetId(selectedAsset.id);
+    
+    if (selectedAsset.checkpoints) {
+      const checkpoints = selectedAsset.checkpoints.split(',').map(id => parseInt(id, 10));
+      await fetchFieldNames(checkpoints);
+    } else {
+      setFieldNames([]);
+    }
+  } else {
+    setSelectedAssetId("");
+    setFieldNames([]);
+  }
+};
+
+const handleFormSubmit = async () => {
   try {
     setLoading(true);
 
-    // Create an object to hold the form values
+    // Create an object to hold the form values, including selectedAssetId
     const payload = {
       AssetType: formValues.assetType || "",
       AssetName: formValues.assetName || "",
+      AssetId: selectedAssetId || "", // Include the selected asset ID here
       AssetCondition: formValues.assetCondition || "New",
       Status: formValues.status || "In stock",
     };
@@ -119,10 +130,10 @@ const AddAsset = () => {
     // Make the API request using axios with JSON
     const response = await axios.post(
       "https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php",
-      payload, // Sending as JSON
+      payload,
       {
         headers: {
-          "Content-Type": "application/json", // Set content type to JSON
+          "Content-Type": "application/json",
         },
       }
     );
