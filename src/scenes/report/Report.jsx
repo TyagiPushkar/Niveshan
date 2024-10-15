@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Typography, Select, MenuItem, FormControl, InputLabel, TextField, useTheme } from "@mui/material";
+import { Box, Typography, TextField, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
@@ -11,34 +11,10 @@ const Report = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const [users, setUsers] = useState([]);
-  const [assets, setAssets] = useState([]);
   const [assetIssues, setAssetIssues] = useState([]);
-  const [selectedTable, setSelectedTable] = useState("users");
   const [loading, setLoading] = useState(true);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/users/get_users.php");
-      const data = await response.json();
-      setUsers(data.records);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
-
-  // Fetch Assets Data
-  const fetchAssets = async () => {
-    try {
-      const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php");
-      const data = await response.json();
-      setAssets(data.data);
-    } catch (error) {
-      console.error("Error fetching assets:", error);
-    }
-  };
 
   // Fetch Asset Issues Data
   const fetchAssetIssues = async () => {
@@ -51,92 +27,44 @@ const Report = () => {
     }
   };
 
-  // Fetch all data when component mounts
+  // Fetch asset issues when component mounts
   useEffect(() => {
     setLoading(true);
-    fetchUsers();
-    fetchAssets();
     fetchAssetIssues();
     setLoading(false);
   }, []);
 
   // Function to filter data based on date range
-  const filterByDateRange = (data, dateField) => {
+  const filterByDateRange = (data) => {
     if (!fromDate && !toDate) return data;
 
     const from = fromDate ? new Date(fromDate) : null;
     const to = toDate ? new Date(toDate) : null;
 
     return data.filter(item => {
-      const itemDate = new Date(item[dateField]);
+      const itemDate = new Date(item.IssueDate); // Assuming IssueDate is in YYYY-MM-DD format
       return (!from || itemDate >= from) && (!to || itemDate <= to);
     });
   };
 
-  // Export the selected table as CSV
+  // Export the asset issues data as CSV
   const exportCSV = () => {
-    let csvData = [];
-    let fileName = '';
+    // Apply date filtering to the assetIssues before exporting
+    const filteredAssetIssues = filterByDateRange(assetIssues);
 
-    if (selectedTable === "users") {
-      csvData = users.map(user => ({
-        EmpId: user.EmpId,
-        Name: user.Name,
-        Mobile: user.Mobile,
-        Email: user.Email,
-        Role: user.Role,
-        Status: user.Status,
-        DateOfJoining: user.DateOfJoining
-      }));
-      fileName = 'users_report.csv';
-    } else if (selectedTable === "assets") {
-      csvData = assets.map(asset => ({
-        AssetId: asset.AssetId,
-        AssetName: asset.AssetName,
-        AssetType: asset.AssetType,
-        AssetCondition: asset.AssetCondition,
-        Status: asset.Status,
-        AddDateTime: asset.AddDateTime
-      }));
-      fileName = 'assets_report.csv';
-    } else if (selectedTable === "assetIssues") {
-      csvData = assetIssues.map(issue => ({
-        EmpId: issue.EmpId,
-        AssetID: issue.AssetID,
-        Status: issue.Status,
-        Remark: issue.Remark,
-        IssueDate: issue.IssueDate,
-        AcceptedDate: issue.AcceptedDate
-      }));
-      fileName = 'asset_issues_report.csv';
-    }
+    const csvData = filteredAssetIssues.map(issue => ({
+      EmpId: issue.EmpId,
+      AssetID: issue.AssetID,
+      Status: issue.Status,
+      Remark: issue.Remark,
+      IssueDate: issue.IssueDate,
+      AcceptedDate: issue.AcceptedDate
+    }));
 
     const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, fileName);
+    saveAs(blob, 'asset_issues_report.csv');
   };
-
-  // DataGrid Columns for each table
-  const userColumns = [
-    { field: "EmpId", headerName: "Emp ID", width: 120 },
-    { field: "Name", headerName: "Name", flex: 1 },
-    { field: "Mobile", headerName: "Mobile", flex: 1 },
-    { field: "Email", headerName: "Email", flex: 1 },
-    { field: "Role", headerName: "Role", flex: 1 },
-    { field: "Status", headerName: "Status", flex: 1 },
-    { field: "DateOfJoining", headerName: "Joining Date", flex: 1 },
-  ];
-
-  const assetColumns = [
-    { field: "AssetId", headerName: "Asset ID", width: 120 },
-    { field: "AssetType", headerName: "Type", flex: 1 },
-    { field: "AssetName", headerName: "Name", flex: 1 },
-    { field: "AssetCondition", headerName: "Condition", flex: 1 },
-    { field: "Make", headerName: "Make", flex: 1 },
-    { field: "Model", headerName: "Model", flex: 1 },
-    { field: "SerialNo", headerName: "S/No.", flex: 1 },
-    { field: "Status", headerName: "Status", flex: 1 },
-  ];
 
   const assetIssueColumns = [
     { field: "EmpId", headerName: "Emp ID", width: 120 },
@@ -150,21 +78,9 @@ const Report = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Reports" subtitle="Download Reports" />
-   <FormControl sx={{ minWidth: 200, marginBottom: "20px" }}>
-        <InputLabel id="table-select-label">Select Table</InputLabel>
-        <Select
-          labelId="table-select-label"
-          value={selectedTable}
-          label="Select Table"
-          onChange={(event) => setSelectedTable(event.target.value)}
-        >
-          <MenuItem value="users">Users</MenuItem>
-          <MenuItem value="assets">Assets</MenuItem>
-          <MenuItem value="assetIssues">Asset Issues</MenuItem>
-        </Select>
-      </FormControl>
-        {/* Date Filters */}y
+        <Header title="Asset Issues Report" subtitle="Download Asset Issues Report" />
+        
+        {/* Date Filters */}
         <Box display="flex" gap="10px">
           <TextField
             label="From Date"
@@ -200,9 +116,6 @@ const Report = () => {
         </Box>
       </Box>
 
-      {/* Dropdown for selecting which table to export */}
-   
-
       {/* Data Grid */}
       <Box
         m="10px 0 0 0"
@@ -230,27 +143,11 @@ const Report = () => {
           },
         }}
       >
-        {selectedTable === "users" && (
-          <DataGrid
-            rows={users.map((item, index) => ({ ...item, id: index + 1 }))}
-            columns={userColumns}
-            loading={loading}
-          />
-        )}
-        {selectedTable === "assets" && (
-          <DataGrid
-            rows={assets.map((item, index) => ({ ...item, id: index + 1 }))}
-            columns={assetColumns}
-            loading={loading}
-          />
-        )}
-        {selectedTable === "assetIssues" && (
-          <DataGrid
-            rows={assetIssues.map((item, index) => ({ ...item, id: index + 1 }))}
-            columns={assetIssueColumns}
-            loading={loading}
-          />
-        )}
+        <DataGrid
+          rows={filterByDateRange(assetIssues).map((item, index) => ({ ...item, id: index + 1 }))}
+          columns={assetIssueColumns}
+          loading={loading}
+        />
       </Box>
     </Box>
   );

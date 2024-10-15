@@ -4,8 +4,10 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import Devices from "@mui/icons-material/Devices";
-import FormatListNumberedIcon from "@mui/icons-material/Devices";
 import Header from "../../components/Header";
+import Papa from 'papaparse';
+import { saveAs } from 'file-saver';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 
 const Asset = () => {
   const theme = useTheme();
@@ -63,14 +65,12 @@ const Asset = () => {
       headerName: "S/No.",
       flex: 1,
     },
-    
     {
       field: "Quantity",
       headerName: "Qty",
       type: "number",
       width: 100,
     },
-    
     {
       field: "VendorName",
       headerName: "Vendor",
@@ -82,14 +82,33 @@ const Asset = () => {
       flex: 1,
     },
   ];
- const handleRowClick = (params) => {
+
+  const handleRowClick = (params) => {
     navigate(`/asset/${params.row.AssetId}`); // Navigating to the detail page with AssetId
   };
+
   const handleRedirect = () => {
     navigate("/add-asset"); // Redirect to the /form route for adding new assets
   };
-  const handleRedirect1 = () => {
-    navigate("/issue-asset"); // Redirect to the /form route for adding new assets
+
+  // Function to export asset data as CSV
+  const exportCSV = () => {
+    const csvData = assetData.map(asset => ({
+      "Asset ID": asset.AssetId,
+      "Type": asset.AssetType,
+      "Name": asset.AssetName,
+      "Condition": asset.AssetCondition,
+      "Make": asset.Make,
+      "Model": asset.Model,
+      "S/No.": asset.SerialNo,
+      "Quantity": asset.Quantity,
+      "Vendor": asset.VendorName,
+      "Status": asset.Status,
+    }));
+
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'assets_report.csv');
   };
 
   return (
@@ -97,22 +116,40 @@ const Asset = () => {
       {/* Header and Add New button */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="ASSETS" subtitle="Managing the Assets" />
-        <Box
-          width="20%"
-          p="5px"
-          display="flex"
-          justifyContent="center"
-          backgroundColor={colors.greenAccent[600]}
-          borderRadius="4px"
-          sx={{ cursor: "pointer" }}
-          onClick={handleRedirect}
-        >
-          <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
-            Add New
-          </Typography>
-          <Devices sx={{ color: colors.grey[100] }} />
+        <Box display="flex" gap="10px">
+          <Box
+            
+            p="5px"
+            display="flex"
+            justifyContent="center"
+            backgroundColor={colors.greenAccent[600]}
+            borderRadius="4px"
+            sx={{ cursor: "pointer" }}
+            onClick={handleRedirect}
+          >
+            <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
+              Add New
+            </Typography>
+            <Devices sx={{ color: colors.grey[100] }} />
+          </Box>
+
+          {/* Export CSV Button */}
+          <Box
+            
+            p="5px"
+            display="flex"
+            justifyContent="center"
+            backgroundColor={colors.greenAccent[600]}
+            borderRadius="4px"
+            sx={{ cursor: "pointer" }}
+            onClick={exportCSV}
+          >
+            <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
+              Export CSV
+            </Typography>
+            <SummarizeIcon sx={{ color: colors.grey[100] }} />
+          </Box>
         </Box>
-        
       </Box>
 
       {/* Data Grid */}
@@ -144,10 +181,10 @@ const Asset = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={assetData.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={assetData.map((item, index) => ({ ...item, id: index + 1 }))} // Ensure each row has a unique ID
           columns={columns}
-                  loading={loading}
-                  onRowClick={handleRowClick}
+          loading={loading}
+          onRowClick={handleRowClick}
         />
       </Box>
     </Box>

@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import Devices from "@mui/icons-material/Devices";
 import Header from "../../components/Header";
+import Papa from 'papaparse';
+import { saveAs } from 'file-saver';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 
 const Support = () => {
   const theme = useTheme();
@@ -78,25 +82,61 @@ const Support = () => {
     navigate("/raise-ticket"); // Redirect to the form route for adding a new support ticket
   };
 
+  // Function to export ticket data as CSV
+  const exportCSV = () => {
+    const csvData = ticketData.map(ticket => ({
+      "Ticket ID": ticket.id,
+      "Employee ID": ticket.EmpId,
+      "Category": ticket.Category,
+      "Status": ticket.Status,
+      "Date Created": ticket.DateTime,
+      "Last Updated": ticket.UpdateDateTime,
+    }));
+
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'support_tickets_report.csv');
+  };
+
   return (
     <Box m="20px">
       {/* Header and Add New button */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Support Tickets" subtitle="Managing Support Tickets" />
-        <Box
-          width="20%"
-          p="5px"
-          display="flex"
-          justifyContent="center"
-          backgroundColor={colors.greenAccent[600]}
-          borderRadius="4px"
-          sx={{ cursor: "pointer" }}
-          onClick={handleCreateTicket}
-        >
-          <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
-            Raise Ticket
-          </Typography>
-          <Devices sx={{ color: colors.grey[100] }} />
+        
+        <Box display="flex" gap="10px">
+          <Box
+           
+            p="5px"
+            display="flex"
+            justifyContent="center"
+            backgroundColor={colors.greenAccent[600]}
+            borderRadius="4px"
+            sx={{ cursor: "pointer" }}
+            onClick={handleCreateTicket}
+          >
+            <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
+              Raise Ticket
+            </Typography>
+            <LiveHelpIcon sx={{ color: colors.grey[100] }} />
+          </Box>
+
+          {/* Export CSV Button */}
+          <Box
+           
+            p="5px"
+            display="flex"
+            justifyContent="center"
+            backgroundColor={colors.greenAccent[600]}
+            borderRadius="4px"
+            sx={{ cursor: "pointer" }}
+            onClick={exportCSV}
+          >
+            <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
+              Export CSV
+            </Typography>
+            <SummarizeIcon sx={{ color: colors.grey[100] }} />
+          </Box>
         </Box>
       </Box>
 

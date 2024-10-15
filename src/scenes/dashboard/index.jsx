@@ -114,34 +114,42 @@ const Dashboard = () => {
       </Box>
 
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
-          <StatBox
+        <Box gridColumn="span 6" backgroundColor={colors.primary[400]} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+         <StatBox
             title={dashboardData.ticketStats.totalTickets || 0}
             subtitle="Total Tickets"
             icon={<EmailIcon sx={{ color: colors.greenAccent[600] }} />}
           />
+          <StatBox
+            title={dashboardData.ticketStats.openTickets || 0}
+            subtitle="Open Tickets"
+            icon={<EmailIcon sx={{ color: colors.greenAccent[600] }} />}
+          />
+           <StatBox
+            title={dashboardData.ticketStats.resolvedTickets || 0}
+            subtitle="Resolved Tickets"
+            icon={<EmailIcon sx={{ color: colors.greenAccent[600] }} />}
+          />
         </Box>
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
+        
+        <Box gridColumn="span 6" backgroundColor={colors.primary[400]} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+           <StatBox
+            title={dashboardData.assetStats.totalAssets || 0}
+            subtitle="Total Assets"
+            icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600] }} />}
+          />
           <StatBox
             title={dashboardData.assetStats.liveAssets || 0}
             subtitle="Live Assets"
             icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600] }} />}
           />
-        </Box>
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
-          <StatBox
-            title={dashboardData.assetStats.retiredAssets || 0}
-            subtitle="Retired Assets"
-            icon={<PersonAddIcon sx={{ color: colors.greenAccent[600] }} />}
-          />
-        </Box>
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} display="flex" alignItems="center" justifyContent="center">
           <StatBox
             title={dashboardData.assetStats.inStockAssets || 0}
-            subtitle="In-Stock Assets"
-            icon={<TrafficIcon sx={{ color: colors.greenAccent[600] }} />}
+            subtitle="In Stock Assets"
+            icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600] }} />}
           />
         </Box>
+       
 
         <Box gridColumn="span 8" gridRow="span 3" backgroundColor={colors.primary[400]}>
           <Box mt="25px" p="0 30px" display="flex" justifyContent="space-between" alignItems="center">
@@ -209,8 +217,8 @@ const Dashboard = () => {
                 backgroundColor={colors.greenAccent[500]} 
                 p="5px 10px" 
                 borderRadius="4px"
-                onClick={() => navigate(`/support/${transaction.id}`)} // Navigate to the ticket details
-                sx={{ cursor: 'pointer' }} // Change cursor to pointer
+                onClick={() => navigate(`/support/${transaction.id}`)} 
+                sx={{ cursor: 'pointer' }} 
               >
                 {transaction.Status}
               </Box>
