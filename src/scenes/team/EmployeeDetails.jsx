@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 
@@ -85,12 +85,12 @@ const EmployeeDetails = () => {
                           {assetsData.map((asset, index) => (
                   <Grid item xs={12} sm={6} md={4} key={index}>
               <Box key={index} mb="15px" p="10px" backgroundColor={colors.blueAccent[700]} borderRadius="8px">
-                <Typography variant="subtitle1">Asset ID: {asset.AssetID}</Typography>
-                <Typography variant="subtitle1">Asset Name: {asset.AssetName}</Typography>
-                <Typography variant="subtitle1">Status: {asset.Status}</Typography>
-                <Typography variant="subtitle1">Issue Date: {asset.IssueDate}</Typography>
-                <Typography variant="subtitle1">Accepted Date: {asset.AcceptedDate}</Typography>
-                <Typography variant="subtitle1">Remark: {asset.Remark}</Typography>
+                <Typography variant="subtitle1">Asset ID: &nbsp; <Link style={{textDecoration:"none", color:"white"}} to={`/asset/${asset.AssetID}`}>{asset.AssetID}</Link> </Typography>
+                <Typography variant="subtitle1">Asset Name: &nbsp; {asset.AssetName}</Typography>
+                <Typography variant="subtitle1">Status: &nbsp; {asset.Status}</Typography>
+                <Typography variant="subtitle1">Issue Date: &nbsp; {asset.IssueDate}</Typography>
+                <Typography variant="subtitle1">Accepted Date: &nbsp; {asset.AcceptedDate}</Typography>
+                <Typography variant="subtitle1">Remark: &nbsp; {asset.Remark}</Typography>
                                   </Box>
                                   </Grid>
                           ))}

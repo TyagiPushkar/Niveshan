@@ -172,6 +172,7 @@ const Support = () => {
           columns={columns}
           loading={loading}
           onRowClick={handleRowClick}
+          sx={{cursor:"pointer"}}
         />
       </Box>
     </Box>

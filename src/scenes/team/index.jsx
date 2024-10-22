@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
@@ -12,6 +12,7 @@ const Team = () => {
   const colors = tokens(theme.palette.mode);
   const [teamData, setTeamData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch data from the API
   useEffect(() => {
@@ -67,6 +68,15 @@ const Team = () => {
     },
   ];
 
+  // Filter team data based on the search term
+  const filteredTeamData = teamData.filter(
+    (item) =>
+      item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.Mobile.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.Email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.Role.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Handle row click to redirect to the employee details page
   const handleRowClick = (params) => {
     navigate(`/employee/${params.row.EmpId}`); // Redirect to employee details route
@@ -74,9 +84,28 @@ const Team = () => {
 
   return (
     <Box m="20px">
-      {/* Wrap Header and Add New button in a Box */}
+      {/* Wrap Header, Add New button, and search field in a Box */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="TEAM" subtitle="Managing the Team Members" />
+              <Box mt={2} mb={2}>
+        <TextField
+          label="Search team..."
+          variant="outlined"
+          fullWidth
+          value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+           InputLabelProps={{
+            style: { color: colors.grey[100] }, // White text color for label
+          }}
+          InputProps={{
+            style: {
+              color: colors.grey[100], // White text color for input
+              backgroundColor: colors.primary[400], // Dark background
+            },
+          }}
+
+        />
+      </Box>
         <Box
           width="20%"
           p="5px"
@@ -94,6 +123,10 @@ const Team = () => {
         </Box>
       </Box>
 
+      {/* Search field */}
+
+
+      {/* DataGrid */}
       <Box
         m="10px 0 0 0"
         height="75vh"
@@ -125,10 +158,11 @@ const Team = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={teamData.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={filteredTeamData.map((item, index) => ({ ...item, id: index + 1 }))}
           columns={columns}
           loading={loading}
           onRowClick={handleRowClick} // Add row click handler
+          sx={{cursor:'pointer'}}
         />
       </Box>
     </Box>

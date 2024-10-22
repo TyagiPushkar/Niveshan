@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, TextField, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
@@ -15,6 +15,7 @@ const Asset = () => {
   const colors = tokens(theme.palette.mode);
   const [assetData, setAssetData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch data from the API
   useEffect(() => {
@@ -111,14 +112,40 @@ const Asset = () => {
     saveAs(blob, 'assets_report.csv');
   };
 
+  // Filter assets based on the search term
+  const filteredAssets = assetData.filter((asset) =>
+    asset.AssetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    asset.AssetType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    asset.Status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    asset.AssetId.toString().includes(searchTerm)
+  );
+
   return (
     <Box m="20px">
       {/* Header and Add New button */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="ASSETS" subtitle="Managing the Assets" />
+         <Box mt={2} mb={2}>
+        <TextField
+          label="Search assets..."
+          variant="outlined"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputLabelProps={{
+            style: { color: colors.grey[100] }, // White text color for label
+          }}
+          InputProps={{
+            style: {
+              color: colors.grey[100], // White text color for input
+              backgroundColor: colors.primary[400], // Dark background
+            },
+          }}
+        />
+      </Box>
+
         <Box display="flex" gap="10px">
           <Box
-            
             p="5px"
             display="flex"
             justifyContent="center"
@@ -135,7 +162,6 @@ const Asset = () => {
 
           {/* Export CSV Button */}
           <Box
-            
             p="5px"
             display="flex"
             justifyContent="center"
@@ -152,6 +178,8 @@ const Asset = () => {
         </Box>
       </Box>
 
+      {/* Search Box */}
+     
       {/* Data Grid */}
       <Box
         m="10px 0 0 0"
@@ -181,10 +209,11 @@ const Asset = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={assetData.map((item, index) => ({ ...item, id: index + 1 }))} // Ensure each row has a unique ID
+          rows={filteredAssets.map((item, index) => ({ ...item, id: index + 1 }))} // Ensure each row has a unique ID
           columns={columns}
           loading={loading}
           onRowClick={handleRowClick}
+          sx={{cursor:'pointer'}}
         />
       </Box>
     </Box>

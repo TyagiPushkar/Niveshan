@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, CircularProgress, Grid } from "@mui/material";
+import { Box, Typography, CircularProgress, Grid, Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 
@@ -9,9 +9,17 @@ const AssetDetail = () => {
   const [loading, setLoading] = useState(true);
   const [issueHistory, setIssueHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
-    const fetchAssetDetail = async () => {
+    
+
+   
+
+    fetchAssetDetail();
+    fetchIssueHistory();
+  }, [assetId]);
+  const fetchAssetDetail = async () => {
       try {
         const response = await fetch(`https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php?AssetId=${assetId}`);
         const data = await response.json();
@@ -23,8 +31,7 @@ const AssetDetail = () => {
         setLoading(false);
       }
     };
-
-    const fetchIssueHistory = async () => {
+ const fetchIssueHistory = async () => {
       try {
         const response = await fetch(`https://namami-infotech.com/NiveshanBackend/api/assets/get_asset_issue_history.php?AssetID=${assetId}`);
         const data = await response.json();
@@ -36,10 +43,39 @@ const AssetDetail = () => {
         setHistoryLoading(false);
       }
     };
+  const updateStatusToInStock = async () => {
+    setUpdateLoading(true);
+    try {
+      const response = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            AssetID: assetDetail.AssetId,
+            Status: "In stock",
+          }),
+        }
+      );
 
-    fetchAssetDetail();
-    fetchIssueHistory();
-  }, [assetId]);
+      const data = await response.json();
+      if (data.success) {
+        setAssetDetail((prev) => ({ ...prev, Status: "In stock" })); 
+        fetchAssetDetail()
+         fetchIssueHistory();
+      } else {
+        fetchAssetDetail()
+         fetchIssueHistory();
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("An error occurred while updating the status.");
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -110,6 +146,18 @@ const AssetDetail = () => {
             <Typography variant="h6">Added On: {assetDetail.AddDateTime}</Typography>
           </Grid>
         </Grid>
+      </Box>
+
+      {/* Button to Update Status */}
+      <Box mt="20px">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={updateStatusToInStock}
+          disabled={updateLoading || assetDetail.Status === "In stock"}
+        >
+          {updateLoading ? "Updating..." : "Set Status to 'In stock'"}
+        </Button>
       </Box>
 
       {/* Asset Issue History Section */}
