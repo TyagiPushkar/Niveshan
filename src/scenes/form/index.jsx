@@ -183,7 +183,7 @@ const Form = () => {
               />
               {/* Dropdown for Role */}
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
-                <InputLabel id="role-label">Role</InputLabel>
+                <InputLabel id="role-label">Designation</InputLabel>
                 <Select
                   labelId="role-label"
                   name="role"
@@ -203,7 +203,7 @@ const Form = () => {
 
               {/* Dropdown for Functions */}
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
-                <InputLabel id="functions-label">Functions</InputLabel>
+                <InputLabel id="functions-label">Department</InputLabel>
                 <Select
                   labelId="functions-label"
                   name="functions"

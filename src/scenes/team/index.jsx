@@ -53,7 +53,7 @@ const Team = () => {
     },
     {
       field: "Role",
-      headerName: "Role",
+      headerName: "Designation",
       flex: 1,
     },
     {

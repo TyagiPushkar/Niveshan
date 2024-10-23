@@ -124,7 +124,7 @@ const Profile = () => {
         <Typography variant="h6">Name: {employeeData.Name}</Typography>
         <Typography variant="h6">Mobile: {employeeData.Mobile}</Typography>
         <Typography variant="h6">Email: {employeeData.Email}</Typography>
-        <Typography variant="h6">Role: {employeeData.Role}</Typography>
+        <Typography variant="h6">Designation: {employeeData.Role}</Typography>
         <Typography variant="h6">Status: {employeeData.Status}</Typography>
         <Typography variant="h6">Date of Joining: {employeeData.DateOfJoining}</Typography>
       </Box>
