@@ -142,6 +142,12 @@ const AssetDetail = () => {
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Warranty: {assetDetail.Warranty}</Typography>
           </Grid>
+           <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6">MacAddress: {assetDetail.MacAddress}</Typography>
+          </Grid>
+           <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6">Processor: {assetDetail.Processor}</Typography>
+          </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Added On: {assetDetail.AddDateTime}</Typography>
           </Grid>

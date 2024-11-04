@@ -1,4 +1,4 @@
-import { Box, Button, TextField, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -17,7 +17,6 @@ const Form = () => {
     const fetchRoles = async () => {
       try {
         const response = await axios.get("https://namami-infotech.com/NiveshanBackend/api/users/roles.php");
-        // Extracting the array from the response
         if (response.data.records && Array.isArray(response.data.records)) {
           setRoles(response.data.records);
         } else {
@@ -31,7 +30,6 @@ const Form = () => {
     const fetchFunctions = async () => {
       try {
         const response = await axios.get("https://namami-infotech.com/NiveshanBackend/api/users/functions.php");
-        // Extracting the array from the response
         if (response.data.records && Array.isArray(response.data.records)) {
           setFunctions(response.data.records);
         } else {
@@ -68,8 +66,8 @@ const Form = () => {
 
       if (response.data) {
         alert("User created successfully");
-        console.log(response.data); // Optional: to log the API response
-        resetForm(); // Resets the form after successful submission
+        console.log(response.data);
+        resetForm();
       }
     } catch (error) {
       console.error("Error creating user:", error);
@@ -181,45 +179,34 @@ const Form = () => {
                 helperText={touched.rm_mail && errors.rm_mail}
                 sx={{ gridColumn: "span 2" }}
               />
-              {/* Dropdown for Role */}
-              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
-                <InputLabel id="role-label">Designation</InputLabel>
-                <Select
-                  labelId="role-label"
-                  name="role"
-                  value={values.role}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched.role && !!errors.role}
-                >
-                  {roles.map((role) => (
-                    <MenuItem key={role.role_id} value={role.role_name}>
-                      {role.role_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {touched.role && errors.role && <div>{errors.role}</div>}
-              </FormControl>
-
-              {/* Dropdown for Functions */}
-              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
-                <InputLabel id="functions-label">Department</InputLabel>
-                <Select
-                  labelId="functions-label"
-                  name="functions"
-                  value={values.functions}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched.functions && !!errors.functions}
-                >
-                  {functions.map((func) => (
-                    <MenuItem key={func.function_id} value={func.function_name}>
-                      {func.function_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {touched.functions && errors.functions && <div>{errors.functions}</div>}
-              </FormControl>
+              {/* Text field for Designation */}
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Designation"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.role}
+                name="role"
+                error={!!touched.role && !!errors.role}
+                helperText={touched.role && errors.role}
+                sx={{ gridColumn: "span 2" }}
+              />
+              {/* Text field for Department */}
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Department"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.functions}
+                name="functions"
+                error={!!touched.functions && !!errors.functions}
+                helperText={touched.functions && errors.functions}
+                sx={{ gridColumn: "span 2" }}
+              />
 
               <TextField
                 fullWidth
@@ -252,7 +239,7 @@ const phoneRegExp =
   /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
 const checkoutSchema = yup.object().shape({
-  empId: yup.string(), // EmpId is not required anymore
+  empId: yup.string(),
   name: yup.string().required("required"),
   password: yup.string().required("required"),
   mobile: yup.string().matches(phoneRegExp, "Phone number is not valid").required("required"),

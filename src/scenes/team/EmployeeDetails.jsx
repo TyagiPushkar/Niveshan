@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { Box, Grid, Typography, useTheme, IconButton, Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Link, useParams } from "react-router-dom";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 
 const EmployeeDetails = () => {
-  const { EmpId } = useParams(); // Get EmpId from URL
+  const { EmpId } = useParams();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [employeeData, setEmployeeData] = useState(null);
-  const [assetsData, setAssetsData] = useState(null); // Initialize as null
+  const [assetsData, setAssetsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [assetsLoading, setAssetsLoading] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedAssetId, setSelectedAssetId] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   // Fetch employee data by EmpId
   useEffect(() => {
@@ -21,7 +25,7 @@ const EmployeeDetails = () => {
           `https://namami-infotech.com/NiveshanBackend/api/users/get_users.php?EmpId=${EmpId}`
         );
         const data = await response.json();
-        setEmployeeData(data); // Assuming the API returns the employee data directly
+        setEmployeeData(data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching employee data:", error);
@@ -35,7 +39,11 @@ const EmployeeDetails = () => {
           `https://namami-infotech.com/NiveshanBackend/api/assets/get_asset_issue.php?EmpId=${EmpId}`
         );
         const data = await response.json();
-        setAssetsData(data.records || []); // Ensure it's an array or empty
+        // Filter assets with status "Accepted" or "Issued"
+        const filteredAssets = data.records?.filter(
+          (asset) => asset.Status === "Accepted" || asset.Status === "Issued"
+        ) || [];
+        setAssetsData(filteredAssets);
         setAssetsLoading(false);
       } catch (error) {
         console.error("Error fetching asset data:", error);
@@ -46,6 +54,53 @@ const EmployeeDetails = () => {
     fetchEmployeeData();
     fetchAssetsData();
   }, [EmpId]);
+
+  // Function to open menu for asset
+  const handleMenuOpen = (event, assetId) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedAssetId(assetId);
+  };
+
+  // Function to close menu
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedAssetId(null);
+  };
+
+  // Update asset status to "In stock"
+  const updateStatusToInStock = async () => {
+    setUpdateLoading(true);
+    try {
+      const response = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            AssetID: selectedAssetId,
+            Status: "In stock",
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setAssetsData((prevAssets) =>
+          prevAssets.map((asset) =>
+            asset.AssetID === selectedAssetId ? { ...asset, Status: "In stock" } : asset
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("An error occurred while updating the status.");
+    } finally {
+      setUpdateLoading(false);
+      handleMenuClose();
+    }
+  };
 
   if (loading) {
     return <Typography>Loading employee data...</Typography>;
@@ -75,26 +130,47 @@ const EmployeeDetails = () => {
 
         {assetsLoading ? (
           <Typography>Loading assets data...</Typography>
-        ) : assetsData && assetsData.length > 0 ? ( // Check if assetsData exists and has length
-          <Box
-            p="20px"
-            backgroundColor={colors.primary[400]}
-            borderRadius="8px"
-                      >
-                          <Grid container spacing={3}>
-                          {assetsData.map((asset, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-              <Box key={index} mb="15px" p="10px" backgroundColor={colors.blueAccent[700]} borderRadius="8px">
-                <Typography variant="subtitle1">Asset ID: &nbsp; <Link style={{textDecoration:"none", color:"white"}} to={`/asset/${asset.AssetID}`}>{asset.AssetID}</Link> </Typography>
-                <Typography variant="subtitle1">Asset Name: &nbsp; {asset.AssetName}</Typography>
-                <Typography variant="subtitle1">Status: &nbsp; {asset.Status}</Typography>
-                <Typography variant="subtitle1">Issue Date: &nbsp; {asset.IssueDate}</Typography>
-                <Typography variant="subtitle1">Accepted Date: &nbsp; {asset.AcceptedDate}</Typography>
-                <Typography variant="subtitle1">Remark: &nbsp; {asset.Remark}</Typography>
-                                  </Box>
-                                  </Grid>
-                          ))}
-                              </Grid>
+        ) : assetsData.length > 0 ? (
+          <Box p="20px" backgroundColor={colors.primary[400]} borderRadius="8px">
+            <Grid container spacing={3}>
+              {assetsData.map((asset) => (
+                <Grid item xs={12} sm={6} md={4} key={asset.AssetID}>
+                  <Box mb="15px" p="10px" backgroundColor={colors.blueAccent[700]} borderRadius="8px" sx={{display:'flex', justifyContent:'space-between'}}>
+                    <div>
+                    <Typography variant="subtitle1">
+                      Asset ID:{" "}
+                      <Link style={{ textDecoration: "none", color: "white" }} to={`/asset/${asset.AssetID}`}>
+                        {asset.AssetID}
+                      </Link>
+                    </Typography>
+                    <Typography variant="subtitle1">Asset Name: {asset.AssetName}</Typography>
+                    <Typography variant="subtitle1">Status: {asset.Status}</Typography>
+                    <Typography variant="subtitle1">Issue Date: {asset.IssueDate}</Typography>
+                    <Typography variant="subtitle1">Accepted Date: {asset.AcceptedDate}</Typography>
+                    <Typography variant="subtitle1">Remark: {asset.Remark}</Typography>
+</div>
+                    {/* Three-Dot Menu */}
+                    <IconButton
+                      aria-controls="asset-menu"
+                      aria-haspopup="true"
+                      onClick={(e) => handleMenuOpen(e, asset.AssetID)}
+                    >
+                      <MoreVertIcon style={{ color: "white" }} />
+                    </IconButton>
+                    <Menu
+                      id="asset-menu"
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl && selectedAssetId === asset.AssetID)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={updateStatusToInStock} disabled={updateLoading}>
+                       Return Asset
+                      </MenuItem>
+                    </Menu>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
           </Box>
         ) : (
           <Typography>No assets issued to this employee.</Typography>

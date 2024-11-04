@@ -163,9 +163,6 @@ const Profile = () => {
                     </IconButton>
                             )}
                          </Box>
-                  
-
-                  {/* Icon Button for Status Change */}
                  
                 </Box>
               </Grid>
