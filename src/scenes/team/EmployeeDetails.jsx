@@ -34,7 +34,12 @@ const EmployeeDetails = () => {
       }
     };
 
-    const fetchAssetsData = async () => {
+    
+
+    fetchEmployeeData();
+    fetchAssetsData();
+  }, [EmpId]);
+const fetchAssetsData = async () => {
       try {
         const response = await fetch(
           `https://namami-infotech.com/NiveshanBackend/api/assets/get_asset_issue.php?EmpId=${EmpId}`
@@ -50,11 +55,6 @@ const EmployeeDetails = () => {
         setAssetsLoading(false);
       }
     };
-
-    fetchEmployeeData();
-    fetchAssetsData();
-  }, [EmpId]);
-
   // Fetch asset detail by assetId
   const fetchAssetDetail = async (assetId) => {
     try {
@@ -81,11 +81,13 @@ const EmployeeDetails = () => {
     setSelectedAssetId(null);
   };
 
-  // Update asset status to "In stock"
-  const updateStatusToInStock = async () => {
-    setUpdateLoading(true);
+ const updateStatusToInStockAndReturned = async () => {
+  setUpdateLoading(true);
+
+  // First API call: Update the asset's main status to "In stock"
+  const updateInStockStatus = async () => {
     try {
-      const response = await fetch(
+      const inStockResponse = await fetch(
         "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
         {
           method: "POST",
@@ -98,23 +100,59 @@ const EmployeeDetails = () => {
           }),
         }
       );
-
-      const data = await response.json();
-      if (data.success) {
-        setAssetsData((prevAssets) =>
-          prevAssets.map((asset) =>
-            asset.AssetID === selectedAssetId ? { ...asset, Status: "In stock" } : asset
-          )
-        );
+      const inStockData = await inStockResponse.json();
+      if (inStockData.message) {
+        // alert(inStockData.message);
       }
     } catch (error) {
-      console.error("Error updating status:", error);
-      alert("An error occurred while updating the status.");
-    } finally {
-      setUpdateLoading(false);
-      handleMenuClose();
+      console.error("Error updating to In stock:", error);
+      // alert("Failed to update asset main status to In stock.");
     }
   };
+
+  // Second API call: Update the asset's issue status to "Returned"
+  const updateIssueStatusToReturned = async () => {
+    try {
+      const returnedResponse = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/update_issue_status.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            AssetID: selectedAssetId,
+            Status: "Returned",
+          }),
+        }
+      );
+      const returnedData = await returnedResponse.json();
+      if (returnedData.message) {
+        // alert(returnedData.message);
+      }
+ fetchAssetsData();
+      // Update local state only for "Returned" status
+      if (returnedData.success) {
+        setAssetsData((prevAssets) =>
+          prevAssets.map((asset) =>
+            asset.AssetID === selectedAssetId ? { ...asset, Status: "Returned" } : asset
+          )
+        );
+      } else {
+        // alert("Failed to update issue status to Returned.");
+      }
+    } catch (error) {
+      console.error("Error updating to Returned:", error);
+      // alert("Failed to update issue status to Returned.");
+    }
+  };
+
+  // Execute both updates independently
+  await Promise.all([updateInStockStatus(), updateIssueStatusToReturned()]);
+
+  setUpdateLoading(false);
+  handleMenuClose();
+};
 
   if (loading) {
     return <Typography>Loading employee data...</Typography>;
@@ -175,7 +213,7 @@ const EmployeeDetails = () => {
                       open={Boolean(anchorEl && selectedAssetId === asset.AssetID)}
                       onClose={handleMenuClose}
                     >
-                      <MenuItem onClick={updateStatusToInStock} disabled={updateLoading}>
+                      <MenuItem onClick={updateStatusToInStockAndReturned} disabled={updateLoading}>
                         Return Asset
                       </MenuItem>
                     </Menu>

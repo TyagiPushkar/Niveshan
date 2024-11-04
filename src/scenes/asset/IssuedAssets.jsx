@@ -35,26 +35,24 @@ const IssuedAssets = () => {
 
   const columns = [
     { field: "EmpId", headerName: "Employee ID", width: 150 },
+    { field: "EmployeeName", headerName: "Employee Name", width: 200 }, // Added column for Employee Name
     { field: "AssetID", headerName: "Asset ID", width: 150 },
+    { field: "AssetName", headerName: "Asset Name", width: 200 }, // Added column for Asset Name
+    { field: "AssetType", headerName: "Asset Type", width: 150 }, // Added column for Asset Type
     {
       field: "Status",
       headerName: "Status",
-      width: 120,
-    },
-    {
-      field: "Remark",
-      headerName: "Remark",
-      flex: 1,
+      width: 150,
     },
     {
       field: "IssueDate",
       headerName: "Issue Date",
-      width: 180,
+      width: 150,
     },
     {
       field: "AcceptedDate",
       headerName: "Accepted Date",
-      width: 180,
+      width: 150,
     },
   ];
 
@@ -66,7 +64,10 @@ const IssuedAssets = () => {
   const exportCSV = () => {
     const csvData = issuedAssets.map(issue => ({
       EmpId: issue.EmpId,
+      EmployeeName: issue.EmployeeName, // Include Employee Name in CSV
       AssetID: issue.AssetID,
+      AssetName: issue.AssetName, // Include Asset Name in CSV
+      AssetType: issue.AssetType, // Include Asset Type in CSV
       Status: issue.Status,
       Remark: issue.Remark,
       IssueDate: issue.IssueDate,
@@ -86,7 +87,6 @@ const IssuedAssets = () => {
         
         <Box display="flex" justifyContent="space-between" gap="10px">
           <Box
-           
             p="5px"
             display="flex"
             justifyContent="center"
@@ -103,7 +103,6 @@ const IssuedAssets = () => {
 
           {/* Export CSV Button */}
           <Box
-           
             p="5px"
             display="flex"
             justifyContent="center"
@@ -148,7 +147,10 @@ const IssuedAssets = () => {
         }}
       >
         <DataGrid
-          rows={issuedAssets.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={issuedAssets.map((item, index) => ({
+            ...item,
+            id: index + 1, // Assigning a unique id for each row
+          }))}
           columns={columns}
           loading={loading}
         />

@@ -1,5 +1,6 @@
+// Importing necessary dependencies
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, useTheme } from "@mui/material";
+import { Box, Typography, TextField, Button, useTheme, Modal, Grid } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
@@ -16,6 +17,8 @@ const Asset = () => {
   const [assetData, setAssetData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [open, setOpen] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState(null);
 
   // Fetch data from the API
   useEffect(() => {
@@ -23,7 +26,7 @@ const Asset = () => {
       try {
         const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php");
         const data = await response.json();
-        setAssetData(data.data); // Assuming the assets data is under "data"
+        setAssetData(data.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching asset data:", error);
@@ -36,63 +39,82 @@ const Asset = () => {
 
   const columns = [
     { field: "AssetId", headerName: "Asset ID", width: 120 },
+    { field: "AssetType", headerName: "Type", flex: 1 },
+    { field: "AssetName", headerName: "Name", flex: 1 },
+    { field: "AssetCondition", headerName: "Condition", flex: 1 },
+    { field: "Make", headerName: "Make", flex: 1 },
+    { field: "Model", headerName: "Model", flex: 1 },
+    { field: "SerialNo", headerName: "S/No.", flex: 1 },
+    { field: "VendorName", headerName: "Vendor", flex: 1 },
+    { field: "Status", headerName: "Status", flex: 1 },
     {
-      field: "AssetType",
-      headerName: "Type",
-      flex: 1,
-    },
-    {
-      field: "AssetName",
-      headerName: "Name",
-      flex: 1,
-    },
-    {
-      field: "AssetCondition",
-      headerName: "Condition",
-      flex: 1,
-    },
-    {
-      field: "Make",
-      headerName: "Make",
-      flex: 1,
-    },
-    {
-      field: "Model",
-      headerName: "Model",
-      flex: 1,
-    },
-    {
-      field: "SerialNo",
-      headerName: "S/No.",
-      flex: 1,
-    },
-    {
-      field: "Quantity",
-      headerName: "Qty",
-      type: "number",
-      width: 100,
-    },
-    {
-      field: "VendorName",
-      headerName: "Vendor",
-      flex: 1,
-    },
-    {
-      field: "Status",
-      headerName: "Status",
-      flex: 1,
+      field: "actions",
+      headerName: "Actions",
+      width: 200,
+      renderCell: (params) => (
+        <Box display="flex" justifyContent="space-between" width="100%">
+          <Button 
+            onClick={() => handleViewClick(params.row.AssetId)} 
+            variant="outlined" 
+            color="secondary"
+          >
+            View
+          </Button>
+          <Button 
+            onClick={() => handleEditClick(params.row)} 
+            variant="outlined" 
+            color="secondary"
+          >
+            Edit
+          </Button>
+        </Box>
+      ),
     },
   ];
 
-  const handleRowClick = (params) => {
-    navigate(`/asset/${params.row.AssetId}`); // Navigating to the detail page with AssetId
+  const handleViewClick = (assetId) => {
+    navigate(`/asset/${assetId}`); // Navigate to the detail page
   };
 
   const handleRedirect = () => {
-    navigate("/add-asset"); // Redirect to the /form route for adding new assets
+    navigate("/add-asset"); // Redirect to add new asset
   };
 
-  // Function to export asset data as CSV
+  const handleEditClick = (asset) => {
+    setSelectedAsset(asset);
+    setOpen(true); // Open the edit modal
+  };
+
+  const handleModalClose = () => {
+    setOpen(false);
+    setSelectedAsset(null); // Clear selected asset on close
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedAsset((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateAsset = async () => {
+    try {
+      const response = await fetch(`https://namami-infotech.com/NiveshanBackend/api/assets/edit_asset.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(selectedAsset),
+      });
+      if (response.ok) {
+        handleModalClose();
+        alert("Asset updated successfully!");
+      } else {
+        alert("Failed to update asset.");
+      }
+    } catch (error) {
+      console.error("Error updating asset:", error);
+    }
+  };
+
   const exportCSV = () => {
     const csvData = assetData.map(asset => ({
       "Asset ID": asset.AssetId,
@@ -102,9 +124,13 @@ const Asset = () => {
       "Make": asset.Make,
       "Model": asset.Model,
       "S/No.": asset.SerialNo,
-      "Quantity": asset.Quantity,
       "Vendor": asset.VendorName,
       "Status": asset.Status,
+      "MacAddress": asset.MacAddress,
+      "Processor": asset.Processor,
+      "Warranty": asset.Warranty,
+      "RAM": asset.RAM,
+      "Harddisk": asset.Harddisk,
     }));
 
     const csv = Papa.unparse(csvData);
@@ -112,7 +138,6 @@ const Asset = () => {
     saveAs(blob, 'assets_report.csv');
   };
 
-  // Filter assets based on the search term
   const filteredAssets = assetData.filter((asset) =>
     asset.AssetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     asset.AssetType.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -122,28 +147,26 @@ const Asset = () => {
 
   return (
     <Box m="20px">
-      {/* Header and Add New button */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="ASSETS" subtitle="Managing the Assets" />
-         <Box mt={2} mb={2}>
-        <TextField
-          label="Search assets..."
-          variant="outlined"
-          fullWidth
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputLabelProps={{
-            style: { color: colors.grey[100] }, // White text color for label
-          }}
-          InputProps={{
-            style: {
-              color: colors.grey[100], // White text color for input
-              backgroundColor: colors.primary[400], // Dark background
-            },
-          }}
-        />
-      </Box>
-
+        <Box mt={2} mb={2}>
+          <TextField
+            label="Search assets..."
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputLabelProps={{
+              style: { color: colors.grey[100] },
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
+              },
+            }}
+          />
+        </Box>
         <Box display="flex" gap="10px">
           <Box
             p="5px"
@@ -159,8 +182,6 @@ const Asset = () => {
             </Typography>
             <Devices sx={{ color: colors.grey[100] }} />
           </Box>
-
-          {/* Export CSV Button */}
           <Box
             p="5px"
             display="flex"
@@ -178,9 +199,6 @@ const Asset = () => {
         </Box>
       </Box>
 
-      {/* Search Box */}
-     
-      {/* Data Grid */}
       <Box
         m="10px 0 0 0"
         height="75vh"
@@ -209,13 +227,71 @@ const Asset = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={filteredAssets.map((item, index) => ({ ...item, id: index + 1 }))} // Ensure each row has a unique ID
+          rows={filteredAssets.map((item, index) => ({ ...item, id: index + 1 }))}
           columns={columns}
           loading={loading}
-          onRowClick={handleRowClick}
-          sx={{cursor:'pointer'}}
+          sx={{ cursor: 'pointer' }}
         />
       </Box>
+
+      {/* Edit Modal */}
+      <Modal open={open} onClose={handleModalClose}>
+        <Box sx={{
+          width: 500,
+          bgcolor: colors.primary[500],
+          padding: 3,
+          borderRadius: 2,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px', // Spacing between inputs
+        }}>
+          <Typography variant="h6" component="h2" color={colors.grey[100]}>
+            Edit Asset
+          </Typography>
+          {selectedAsset && (
+            <Grid container spacing={1} sx={{ display: 'flex', flexWrap: 'wrap' }}>
+              {Object.keys(selectedAsset).map((key) => (
+                key !== "AssetId" && (
+                  <Grid item xs={3} key={key}> {/* Each field takes up 3 out of 12 columns */}
+                    <TextField
+                      name={key}
+                      label={key}
+                      value={selectedAsset[key]}
+                      onChange={handleInputChange}
+                      fullWidth
+                      margin="normal"
+                      InputLabelProps={{
+                        style: { color: colors.grey[100] },
+                      }}
+                      InputProps={{
+                        style: {
+                          color: colors.grey[100],
+                          backgroundColor: colors.primary[400],
+                        },
+                      }}
+                    />
+                  </Grid>
+                )
+              ))}
+              <Grid item xs={12}>
+                <Box display="flex" justifyContent="flex-end" mt={2}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleUpdateAsset}
+                  >
+                    Update
+                  </Button>
+                </Box>
+              </Grid>
+            </Grid>
+          )}
+        </Box>
+      </Modal>
     </Box>
   );
 };

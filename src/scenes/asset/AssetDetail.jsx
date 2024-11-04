@@ -115,16 +115,18 @@ const AssetDetail = () => {
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Serial No.: {assetDetail.SerialNo}</Typography>
           </Grid>
-
+ <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6">Processor: {assetDetail.Processor}</Typography>
+          </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Hard Disk: {assetDetail.Harddisk}</Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">RAM: {assetDetail.RAM}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          {/* <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Quantity: {assetDetail.Quantity}</Typography>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Status: {assetDetail.Status}</Typography>
@@ -145,9 +147,7 @@ const AssetDetail = () => {
            <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">MacAddress: {assetDetail.MacAddress}</Typography>
           </Grid>
-           <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6">Processor: {assetDetail.Processor}</Typography>
-          </Grid>
+          
           <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6">Added On: {assetDetail.AddDateTime}</Typography>
           </Grid>
@@ -162,7 +162,7 @@ const AssetDetail = () => {
           onClick={updateStatusToInStock}
           disabled={updateLoading || assetDetail.Status === "In stock"}
         >
-          {updateLoading ? "Updating..." : "Set Status to 'In stock'"}
+          {updateLoading ? "Updating..." : "Mark as Faulty"}
         </Button>
       </Box>
 

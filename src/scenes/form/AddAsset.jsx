@@ -12,22 +12,23 @@ const AddAsset = () => {
   const [selectedAssetId, setSelectedAssetId] = useState("");
   const [loading, setLoading] = useState(false);
   
-  const [formValues, setFormValues] = useState({
-    assetType: "",
-    assetName: "",
-    assetCondition: "New",
-    make: "",
-    model: "",
-    serialNo: "",
-    harddisk: "",
-    ram: "",
-    quantity: "",
-    invoiceNo: "",
-    invoiceDate: "",
-    vendorName: "",
-    invoiceAttach: null,
-    status: "In stock",
-  });
+ const [formValues, setFormValues] = useState({
+  assetType: "",
+  assetName: "",
+  assetCondition: "New", // Default value for Asset Condition
+  make: "",
+  model: "",
+  serialNo: "",
+  harddisk: "",
+  ram: "",
+  quantity: "",
+  invoiceNo: "",
+  invoiceDate: "",
+  vendorName: "",
+  invoiceAttach: null,
+  status: "In stock",
+});
+
 
   useEffect(() => {
     const fetchAssetNames = async () => {
@@ -49,7 +50,6 @@ const AddAsset = () => {
       const response = await axios.get(`https://namami-infotech.com/NiveshanBackend/api/assets/get_checkpoints.php?checkpoints=${checkpoints.join(',')}`);
       if (response.data.data && Array.isArray(response.data.data)) {
         setFieldNames(response.data.data);
-        
       } else {
         setFieldNames([]);
       }
@@ -75,8 +75,6 @@ const AddAsset = () => {
     setFieldNames([]);
   };
 
- 
-
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormValues({ ...formValues, [name]: value });
@@ -87,70 +85,66 @@ const AddAsset = () => {
   };
 
   const handleAssetNameChange = async (event) => {
-  const selectedAsset = assetNames.find(asset => asset.name === event.target.value);
-  setFormValues({ ...formValues, assetName: event.target.value });
+    const selectedAsset = assetNames.find(asset => asset.name === event.target.value);
+    setFormValues({ ...formValues, assetName: event.target.value });
 
-  // Ensure that the selectedAsset exists before accessing its properties
-  if (selectedAsset) {
-    setSelectedAssetId(selectedAsset.id);
-    
-    if (selectedAsset.checkpoints) {
-      const checkpoints = selectedAsset.checkpoints.split(',').map(id => parseInt(id, 10));
-      await fetchFieldNames(checkpoints);
+    // Ensure that the selectedAsset exists before accessing its properties
+    if (selectedAsset) {
+      setSelectedAssetId(selectedAsset.id);
+      
+      if (selectedAsset.checkpoints) {
+        const checkpoints = selectedAsset.checkpoints.split(',').map(id => parseInt(id, 10));
+        await fetchFieldNames(checkpoints);
+      } else {
+        setFieldNames([]);
+      }
     } else {
+      setSelectedAssetId("");
       setFieldNames([]);
     }
-  } else {
-    setSelectedAssetId("");
-    setFieldNames([]);
-  }
-};
+  };
 
-const handleFormSubmit = async () => {
-  try {
-    setLoading(true);
+  const handleFormSubmit = async () => {
+    try {
+      setLoading(true);
 
-    // Create an object to hold the form values, including selectedAssetId
-    const payload = {
-      AssetType: formValues.assetType || "",
-      AssetName: formValues.assetName || "",
-      AssetId: selectedAssetId || "", // Include the selected asset ID here
-      AssetCondition: formValues.assetCondition || "New",
-      Status: formValues.status || "In stock",
-    };
+      // Create an object to hold the form values, including selectedAssetId
+      const payload = {
+        AssetType: formValues.assetType || "",
+        AssetName: formValues.assetName || "",
+        AssetId: selectedAssetId || "",
+        AssetCondition: formValues.assetCondition || "New",
+        Status: formValues.status || "In stock",
+      };
 
-    // Append only the fields that come from checkpoints
-    fieldNames.forEach((field) => {
-      const fieldValue = formValues[field.field_name] || "";
-      payload[field.field_name] = fieldValue;
-    });
+      // Append only the fields that come from checkpoints
+      fieldNames.forEach((field) => {
+        const fieldValue = formValues[field.field_name] || "";
+        payload[field.field_name] = fieldValue;
+      });
 
-    console.log("Payload being sent:", payload);
+      console.log("Payload being sent:", payload);
 
-    // Make the API request using axios with JSON
-    const response = await axios.post(
-      "https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php",
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      // Make the API request using axios with JSON
+      const response = await axios.post(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/add_asset.php",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    console.log("API Response:", response.data);
-    alert(response.data.message);
-  } catch (error) {
-    console.error("Error adding asset:", error);
-    alert("Failed to add asset");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-
+      console.log("API Response:", response.data);
+      alert(response.data.message);
+    } catch (error) {
+      console.error("Error adding asset:", error);
+      alert("Failed to add asset");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box m="20px">
@@ -194,18 +188,53 @@ const handleFormSubmit = async () => {
         </FormControl>
 
         {fieldNames.length > 0 && fieldNames.map(field => (
-          <TextField
-            key={field.id}
-            fullWidth
-            variant="filled"
-            label={field.field_name}
-            name={field.field_name}
-            type={field.field_type || "text"}
-            value={formValues[field.field_name] || ""}
-            onChange={handleInputChange}
-            sx={{ gridColumn: "span 2" }}
-          />
-        ))}
+  // Render AssetCondition as a dropdown if the field name is "AssetCondition"
+  field.field_name === "AssetCondition" ? (
+    <FormControl key={field.id} fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+      <InputLabel id="asset-condition-label">Asset Condition</InputLabel>
+      <Select
+        labelId="asset-condition-label"
+        name="assetCondition"
+        value={formValues.assetCondition}
+        onChange={handleInputChange}
+      >
+        <MenuItem value="New">New</MenuItem>
+        <MenuItem value="Refurbished">Refurbished</MenuItem>
+      </Select>
+    </FormControl>
+  ) : (
+    // Render file upload input if field_type is "BLOB"
+    field.field_type === "BLOB" ? (
+      <FormControl key={field.id} fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+        <input
+          accept="image/*" // To accept only image files
+          id={`upload-${field.field_name}`}
+          type="file"
+          style={{ display: "none" }}
+          onChange={(event) => handleFileChange(event, field.field_name)}
+        />
+        <label htmlFor={`upload-${field.field_name}`}>
+          <Button variant="contained" component="span" color="primary" fullWidth>
+            {formValues[field.field_name] ? "File Selected" : "Invoice Attachment"}
+          </Button>
+        </label>
+      </FormControl>
+    ) : (
+      // Render regular text fields for other types
+      <TextField
+        key={field.id}
+        fullWidth
+        variant="filled"
+        label={field.field_name}
+        name={field.field_name}
+        type={field.field_type || "text"}
+        value={formValues[field.field_name] || ""}
+        onChange={handleInputChange}
+        sx={{ gridColumn: "span 2" }}
+      />
+    )
+  )
+))}
 
         <Box mt="20px" sx={{ gridColumn: "span 2" }}>
           <Button

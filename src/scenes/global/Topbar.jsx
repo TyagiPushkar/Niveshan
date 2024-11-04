@@ -55,13 +55,7 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
-        {/* <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton> */}
-        {/* Person Icon with Dropdown */}
+      
         <IconButton onClick={handleMenuClick}>
           <PersonOutlinedIcon />
         </IconButton>

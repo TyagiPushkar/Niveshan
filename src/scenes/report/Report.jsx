@@ -24,14 +24,14 @@ const Report = () => {
       setAssetIssues(data.records);
     } catch (error) {
       console.error("Error fetching asset issues:", error);
+    } finally {
+      setLoading(false); // Set loading to false here
     }
   };
 
   // Fetch asset issues when component mounts
   useEffect(() => {
-    setLoading(true);
     fetchAssetIssues();
-    setLoading(false);
   }, []);
 
   // Function to filter data based on date range
@@ -54,12 +54,19 @@ const Report = () => {
 
     const csvData = filteredAssetIssues.map(issue => ({
       EmpId: issue.EmpId,
+      EmployeeName: issue.EmployeeName, // Added EmployeeName to CSV
       AssetID: issue.AssetID,
+      AssetName: issue.AssetName, // Added AssetName to CSV
+      AssetType: issue.AssetType, // Added AssetType to CSV
       Status: issue.Status,
-      Remark: issue.Remark,
       IssueDate: issue.IssueDate,
       AcceptedDate: issue.AcceptedDate
     }));
+
+    if (csvData.length === 0) {
+      alert("No data available for the selected date range.");
+      return; // Prevent exporting if no data is found
+    }
 
     const csv = Papa.unparse(csvData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -67,12 +74,14 @@ const Report = () => {
   };
 
   const assetIssueColumns = [
-    { field: "EmpId", headerName: "Emp ID", width: 120 },
-    { field: "AssetID", headerName: "Asset ID", flex: 1 },
-    { field: "Status", headerName: "Status", flex: 1 },
-    { field: "Remark", headerName: "Remark", flex: 1 },
-    { field: "IssueDate", headerName: "Issue Date", flex: 1 },
-    { field: "AcceptedDate", headerName: "Accepted Date", flex: 1 },
+    { field: "EmpId", headerName: "Employee ID", width: 150 },
+    { field: "EmployeeName", headerName: "Employee Name", width: 200 },
+    { field: "AssetID", headerName: "Asset ID", width: 150 },
+    { field: "AssetName", headerName: "Asset Name", width: 200 },
+    { field: "AssetType", headerName: "Asset Type", width: 150 },
+    { field: "Status", headerName: "Status", width: 150 },
+    { field: "IssueDate", headerName: "Issue Date", width: 150 },
+    { field: "AcceptedDate", headerName: "Accepted Date", width: 150 },
   ];
 
   return (
@@ -144,7 +153,7 @@ const Report = () => {
         }}
       >
         <DataGrid
-          rows={filterByDateRange(assetIssues).map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={filterByDateRange(assetIssues).map((item, index) => ({ ...item, id: index + 1 }))} // Set unique ID for rows
           columns={assetIssueColumns}
           loading={loading}
         />
