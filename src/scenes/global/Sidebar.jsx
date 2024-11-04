@@ -83,9 +83,7 @@ const Sidebar = () => {
                 <Typography variant="h3" color={colors.grey[100]}>
                   NIVESHAN
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
-                </IconButton>
+                
               </Box>
             )}
           </MenuItem>

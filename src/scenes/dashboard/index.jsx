@@ -102,21 +102,7 @@ const Dashboard = () => {
         gap="20px"
         mt="20px"
       >
-        <StatBox
-          title={dashboardData.ticketStats.totalTickets || 0}
-          subtitle="Total Tickets"
-          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
-        />
-        <StatBox
-          title={dashboardData.ticketStats.openTickets || 0}
-          subtitle="Open Tickets"
-          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
-        />
-        <StatBox
-          title={dashboardData.ticketStats.resolvedTickets || 0}
-          subtitle="Resolved Tickets"
-          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
-        />
+      
         <StatBox
           title={dashboardData.assetStats.totalAssets || 0}
           subtitle="Total Assets"
@@ -134,7 +120,7 @@ const Dashboard = () => {
         />
       </Box>
 
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px" mt="20px">
+      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="120px" gap="20px" mt="20px">
         <Box gridColumn="span 8" gridRow="span 3" backgroundColor={colors.primary[400]}>
           <Box mt="25px" p="0 30px" display="flex" justifyContent="space-between" alignItems="center">
             <Box>
@@ -164,41 +150,27 @@ const Dashboard = () => {
           </Box>
         </Box>
 
-        <Box gridColumn="span 4" gridRow="span 3" backgroundColor={colors.primary[400]} overflow="auto">
+        <Box gridColumn="span 4" gridRow="span 3" backgroundColor={colors.primary[400]}>
           <Box display="flex" justifyContent="space-between" alignItems="center" borderBottom={`4px solid ${colors.primary[500]}`} colors={colors.grey[100]} p="15px">
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Open Tickets
+               Tickets
             </Typography>
           </Box>
-          {dashboardData.ticketDetails.map((transaction, i) => (
-            <Box
-              key={`${transaction.id}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography color={colors.greenAccent[500]} variant="h5" fontWeight="600">
-                  {transaction.id}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {transaction.Category}
-                </Typography>
-              </Box>
-              <Box color={colors.grey[100]}>{transaction.DateTime}</Box>
-              <Box 
-                backgroundColor={colors.greenAccent[500]} 
-                p="5px 10px" 
-                borderRadius="4px"
-                onClick={() => navigate(`/support/${transaction.id}`)} 
-                sx={{ cursor: 'pointer' }} 
-              >
-                {transaction.Status}
-              </Box>
-            </Box>
-          ))}
+           <StatBox
+          title={dashboardData.ticketStats.totalTickets || 0}
+          subtitle="Total Tickets"
+          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
+        />
+        <StatBox
+          title={dashboardData.ticketStats.openTickets || 0}
+          subtitle="Open Tickets"
+          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
+        />
+        <StatBox
+          title={dashboardData.ticketStats.resolvedTickets || 0}
+          subtitle="Resolved Tickets"
+          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
+        />
         </Box>
       </Box>
     </Box>
