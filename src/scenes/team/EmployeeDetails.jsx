@@ -11,6 +11,7 @@ const EmployeeDetails = () => {
   const colors = tokens(theme.palette.mode);
   const [employeeData, setEmployeeData] = useState(null);
   const [assetsData, setAssetsData] = useState([]);
+  const [assetDetail, setAssetDetail] = useState(null); // State to store asset detail
   const [loading, setLoading] = useState(true);
   const [assetsLoading, setAssetsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -39,7 +40,6 @@ const EmployeeDetails = () => {
           `https://namami-infotech.com/NiveshanBackend/api/assets/get_asset_issue.php?EmpId=${EmpId}`
         );
         const data = await response.json();
-        // Filter assets with status "Accepted" or "Issued"
         const filteredAssets = data.records?.filter(
           (asset) => asset.Status === "Accepted" || asset.Status === "Issued"
         ) || [];
@@ -55,10 +55,24 @@ const EmployeeDetails = () => {
     fetchAssetsData();
   }, [EmpId]);
 
+  // Fetch asset detail by assetId
+  const fetchAssetDetail = async (assetId) => {
+    try {
+      const response = await fetch(
+        `https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php?AssetId=${assetId}`
+      );
+      const data = await response.json();
+      setAssetDetail(data.data[0]); // Assuming asset detail is under "data"
+    } catch (error) {
+      console.error("Error fetching asset detail:", error);
+    }
+  };
+
   // Function to open menu for asset
   const handleMenuOpen = (event, assetId) => {
     setAnchorEl(event.currentTarget);
     setSelectedAssetId(assetId);
+    fetchAssetDetail(assetId); // Fetch asset detail when menu opens
   };
 
   // Function to close menu
@@ -122,7 +136,6 @@ const EmployeeDetails = () => {
         <Typography variant="h6">Date of Joining: {employeeData.DateOfJoining}</Typography>
       </Box>
 
-      {/* Issued Assets Section */}
       <Box mt="20px">
         <Typography variant="h6" mb="10px">
           Issued Assets
@@ -137,19 +150,18 @@ const EmployeeDetails = () => {
                 <Grid item xs={12} sm={6} md={4} key={asset.AssetID}>
                   <Box mb="15px" p="10px" backgroundColor={colors.blueAccent[700]} borderRadius="8px" sx={{display:'flex', justifyContent:'space-between'}}>
                     <div>
-                    <Typography variant="subtitle1">
-                      Asset ID:{" "}
-                      <Link style={{ textDecoration: "none", color: "white" }} to={`/asset/${asset.AssetID}`}>
-                        {asset.AssetID}
-                      </Link>
-                    </Typography>
-                    <Typography variant="subtitle1">Asset Name: {asset.AssetName}</Typography>
-                    <Typography variant="subtitle1">Status: {asset.Status}</Typography>
-                    <Typography variant="subtitle1">Issue Date: {asset.IssueDate}</Typography>
-                    <Typography variant="subtitle1">Accepted Date: {asset.AcceptedDate}</Typography>
-                    <Typography variant="subtitle1">Remark: {asset.Remark}</Typography>
-</div>
-                    {/* Three-Dot Menu */}
+                      <Typography variant="subtitle1">
+                        Asset ID:{" "}
+                        <Link style={{ textDecoration: "none", color: "white" }} to={`/asset/${asset.AssetID}`}>
+                          {asset.AssetID}
+                        </Link>
+                      </Typography>
+                      <Typography variant="subtitle1">Asset Name: {assetDetail?.AssetName || asset.AssetName}</Typography>
+                      <Typography variant="subtitle1">Status: {asset.Status}</Typography>
+                      <Typography variant="subtitle1">Issue Date: {asset.IssueDate}</Typography>
+                      <Typography variant="subtitle1">Accepted Date: {asset.AcceptedDate}</Typography>
+                      <Typography variant="subtitle1">Remark: {asset.Remark}</Typography>
+                    </div>
                     <IconButton
                       aria-controls="asset-menu"
                       aria-haspopup="true"
@@ -164,7 +176,7 @@ const EmployeeDetails = () => {
                       onClose={handleMenuClose}
                     >
                       <MenuItem onClick={updateStatusToInStock} disabled={updateLoading}>
-                       Return Asset
+                        Return Asset
                       </MenuItem>
                     </Menu>
                   </Box>
