@@ -166,12 +166,12 @@ const fetchAssetsData = async () => {
     <Box m="20px">
       <Header title="Employee Details" subtitle={`Details for EmpId: ${EmpId}`} />
       <Box mt="20px" p="20px" backgroundColor={colors.primary[400]} borderRadius="8px">
-        <Typography variant="h6">Name: {employeeData.Name}</Typography>
-        <Typography variant="h6">Mobile: {employeeData.Mobile}</Typography>
-        <Typography variant="h6">Email: {employeeData.Email}</Typography>
-        <Typography variant="h6">Designation: {employeeData.Role}</Typography>
-        <Typography variant="h6">Status: {employeeData.Status}</Typography>
-        <Typography variant="h6">Date of Joining: {employeeData.DateOfJoining}</Typography>
+        <Typography variant="h6">Name: <b style={{color:'green'}}> {employeeData.Name}</b></Typography>
+        <Typography variant="h6">Mobile:  <b style={{color:'green'}}> {employeeData.Mobile}</b></Typography>
+        <Typography variant="h6">Email:  <b style={{color:'green'}}> {employeeData.Email}</b></Typography>
+        <Typography variant="h6">Designation:  <b style={{color:'green'}}> {employeeData.Role}</b></Typography>
+        <Typography variant="h6">Status:  <b style={{color:'green'}}> {employeeData.Status}</b></Typography>
+        <Typography variant="h6">Date of Joining:  <b style={{color:'green'}}>{employeeData.DateOfJoining}</b></Typography>
       </Box>
 
       <Box mt="20px">
