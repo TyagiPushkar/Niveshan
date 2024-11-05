@@ -95,19 +95,23 @@ const RaiseTicket = () => {
     <Box m="20px">
       <Header title="Raise Support Ticket" subtitle="Create a new support ticket" />
 
-      {/* Display user details */}
-      {/* <Typography variant="h6">Employee Name: {Name}</Typography>
-      <Typography variant="h6">Email: {Email}</Typography> */}
-
       <form onSubmit={handleSubmit}>
         <Box display="grid" gridTemplateColumns="auto auto" gap="20px" width="80%">
           <FormControl fullWidth required>
-            <InputLabel>Category</InputLabel>
+            <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>
+              Category
+            </InputLabel>
             <Select
               label="Category"
               name="Category"
               value={formData.Category}
               onChange={handleChange}
+              sx={{
+                color: 'white', 
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.greenAccent[500] },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.greenAccent[600] },
+              }}
             >
               <MenuItem value="Hardware">Hardware</MenuItem>
               <MenuItem value="Software">Software</MenuItem>
@@ -125,21 +129,40 @@ const RaiseTicket = () => {
             required
             multiline
             rows={4}
-            style={{ gridColumn: "span 2" }} // Full-width for remark
+            sx={{
+              gridColumn: "span 2",
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': {
+                  borderColor: 'white',
+                },
+                '&:hover fieldset': {
+                  borderColor: colors.greenAccent[500],
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: colors.greenAccent[600],
+                },
+              },
+            }}
           />
 
           <Box>
-            <InputLabel>Upload Image (optional)</InputLabel>
+            <InputLabel sx={{ color: 'white' }}>Upload Image (optional)</InputLabel>
             <input
               type="file"
               name="Image"
               onChange={handleImageChange}
               accept="image/*"
+              style={{ color: 'white' }}
             />
-            {formData.Image && <Typography variant="body2">{formData.Image.name}</Typography>}
+            {formData.Image && <Typography variant="body2" sx={{ color: 'white' }}>{formData.Image.name}</Typography>}
           </Box>
-
-          {/* Status field removed as per your requirements */}
         </Box>
 
         {/* Error & Success Messages */}
