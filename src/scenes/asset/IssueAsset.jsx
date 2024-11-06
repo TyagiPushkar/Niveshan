@@ -45,7 +45,13 @@ const IssueAsset = () => {
       }
     };
 
-    const fetchAssets = async () => {
+   
+
+    fetchEmployees();
+    fetchAssets();
+    setLoading(false);
+  }, []);
+ const fetchAssets = async () => {
       try {
         const response = await fetch(
           "https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php"
@@ -56,12 +62,6 @@ const IssueAsset = () => {
         console.error("Error fetching assets:", error);
       }
     };
-
-    fetchEmployees();
-    fetchAssets();
-    setLoading(false);
-  }, []);
-
   // Handle form field change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -113,6 +113,7 @@ const IssueAsset = () => {
       });
       setAssetType(""); // Reset asset type
       setFilteredAssets([]); // Clear the filtered assets
+       fetchAssets();
     } catch (error) {
       console.error("Error issuing asset:", error);
     } finally {
