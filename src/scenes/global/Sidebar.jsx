@@ -30,6 +30,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
+
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -39,6 +40,8 @@ const Sidebar = () => {
   // Retrieve user data from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
   const { Name, Role } = userDetails; // Destructure Name and Role from userDetails
+ // Determine the logo based on theme mode
+  const logoSrc = theme.palette.mode === 'light' ? '../../assets/LogoLight.png' : '../../assets/Logo.png';
 
   return (
     <Box
@@ -94,7 +97,7 @@ const Sidebar = () => {
                 <img
                   alt="profile-user"
                   width="150px"
-                  src={`../../assets/Logo.png`}
+                  src={logoSrc}
                   style={{ cursor: "pointer" }}
                 />
               </Box>

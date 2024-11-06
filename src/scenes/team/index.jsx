@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, TextField } from "@mui/material";
+import { Box, Typography, useTheme, TextField, Switch } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
@@ -12,24 +12,25 @@ const Team = () => {
   const colors = tokens(theme.palette.mode);
   const [teamData, setTeamData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch data from the API
-  useEffect(() => {
-    const fetchTeamData = async () => {
-      try {
-        const response = await fetch(
-          "https://namami-infotech.com/NiveshanBackend/api/users/get_users.php"
-        );
-        const data = await response.json();
-        setTeamData(data.records); // Assuming the data is under "records"
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching team data:", error);
-        setLoading(false);
-      }
-    };
+  const fetchTeamData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/users/get_users.php"
+      );
+      const data = await response.json();
+      setTeamData(data.records); // Assuming the data is under "records"
+    } catch (error) {
+      console.error("Error fetching team data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTeamData();
   }, []);
 
@@ -66,7 +67,55 @@ const Team = () => {
       headerName: "Date of Joining",
       flex: 1,
     },
+    {
+      field: "Actions",
+      headerName: "Actions",
+      renderCell: (params) => {
+        const isUserActive = params.row.Status === "Active";
+        return (
+          <Switch
+            checked={isUserActive}
+            onChange={() => handleToggleUserStatus(params.row.EmpId, isUserActive)}
+            style={{color:"blue"}}
+          />
+        );
+      },
+      width: 150,
+    },
   ];
+
+  // Handle row click to redirect to the employee details page
+  const handleRowClick = (params) => {
+    navigate(`/employee/${params.row.EmpId}`); // Redirect to employee details route
+  };
+
+  // Function to handle activate/deactivate user
+  const handleToggleUserStatus = (empId, isCurrentlyActive) => {
+    // Prepare data for API call
+    const data = { EmpId: empId };
+
+    // API call to toggle the user's status
+    fetch("https://namami-infotech.com/NiveshanBackend/api/users/deactivate_user.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.message.includes("User status updated")) {
+          alert(result.message);
+          fetchTeamData(); // Reload data after successful toggle
+        } else {
+          alert("Failed to update user status.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+      });
+  };
 
   // Filter team data based on the search term
   const filteredTeamData = teamData.filter(
@@ -77,35 +126,29 @@ const Team = () => {
       item.Role.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle row click to redirect to the employee details page
-  const handleRowClick = (params) => {
-    navigate(`/employee/${params.row.EmpId}`); // Redirect to employee details route
-  };
-
   return (
     <Box m="20px">
       {/* Wrap Header, Add New button, and search field in a Box */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="TEAM" subtitle="Managing the Team Members" />
-              <Box mt={2} mb={2}>
-        <TextField
-          label="Search team..."
-          variant="outlined"
-          fullWidth
-          value={searchTerm}
+        <Box mt={2} mb={2}>
+          <TextField
+            label="Search team..."
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-           InputLabelProps={{
-            style: { color: colors.grey[100] }, // White text color for label
-          }}
-          InputProps={{
-            style: {
-              color: colors.grey[100], // White text color for input
-              backgroundColor: colors.primary[400], // Dark background
-            },
-          }}
-
-        />
-      </Box>
+            InputLabelProps={{
+              style: { color: colors.grey[100] }, // White text color for label
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100], // White text color for input
+                backgroundColor: colors.primary[400], // Dark background
+              },
+            }}
+          />
+        </Box>
         <Box
           width="20%"
           p="5px"
@@ -122,9 +165,6 @@ const Team = () => {
           <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
         </Box>
       </Box>
-
-      {/* Search field */}
-
 
       {/* DataGrid */}
       <Box
@@ -162,7 +202,7 @@ const Team = () => {
           columns={columns}
           loading={loading}
           onRowClick={handleRowClick} // Add row click handler
-          sx={{cursor:'pointer'}}
+          sx={{ cursor: 'pointer' }}
         />
       </Box>
     </Box>

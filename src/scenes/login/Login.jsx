@@ -7,8 +7,10 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // State for managing loading
   const [message, setMessage] = useState(''); // State for managing success/error messages
+  const [isForgotPassword, setIsForgotPassword] = useState(false); // Toggle forgot password mode
   const navigate = useNavigate(); // Initialize useNavigate
 
+  // Handle form submission for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Set loading state to true when submission starts
@@ -60,35 +62,91 @@ const Login = () => {
     }
   };
 
+  // Handle password reset
+  const handlePasswordReset = async () => {
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const response = await fetch('https://namami-infotech.com/NiveshanBackend/api/users/forget_password.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('Password reset successful! Please check your email for the new password.');
+      } else {
+        setMessage(data.message || 'Password reset failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during password reset:', error);
+      setMessage('Error during password reset. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-form">
         <img src={`../../assets/Logo.png`} alt="Logo" />
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+        <h2>{isForgotPassword ? 'Forgot Password' : 'Login'}</h2>
+
+        {!isForgotPassword ? (
+          // Login form
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+            <p className="forgot-password" onClick={() => setIsForgotPassword(true)} style={{cursor:'pointer'}}>
+              Forgot Password?
+            </p>
+          </form>
+        ) : (
+          // Forgot Password form
+          <div>
+            <div className="form-group">
+              <label>Enter your email to reset password</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <button onClick={handlePasswordReset} className="login-button" disabled={loading}>
+              {loading ? 'Sending...' : 'Reset Password'}
+            </button>
+            <p className="back-to-login" onClick={() => setIsForgotPassword(false)} style={{cursor:'pointer'}}>
+              Back to Login
+            </p>
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-          {message && <p className="message">{message}</p>}
-        </form>
+        )}
+
+        {message && <p className="message">{message}</p>}
       </div>
     </div>
   );
