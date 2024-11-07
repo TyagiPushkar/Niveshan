@@ -98,7 +98,7 @@ const Dashboard = () => {
       {/* Summary Grid */}
       <Box
         display="grid"
-        gridTemplateColumns="repeat(auto-fill, minmax(150px, 1fr))"
+        gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
         gap="20px"
         mt="20px"
       >
@@ -106,17 +106,17 @@ const Dashboard = () => {
         <StatBox
           title={dashboardData.assetStats.totalAssets || 0}
           subtitle="Total Assets"
-          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
+          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 30 }} />}
         />
         <StatBox
           title={dashboardData.assetStats.liveAssets || 0}
           subtitle="Live Assets"
-          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
+          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 30 }} />}
         />
         <StatBox
           title={dashboardData.assetStats.inStockAssets || 0}
           subtitle="In Stock Assets"
-          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
+          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 30 }} />}
         />
       </Box>
 

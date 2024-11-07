@@ -76,7 +76,7 @@ const Team = () => {
           <Switch
             checked={isUserActive}
             onChange={() => handleToggleUserStatus(params.row.EmpId, isUserActive)}
-            style={{color:"blue"}}
+            style={{color: "#3DA58A"}}
           />
         );
       },

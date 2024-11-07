@@ -4,10 +4,10 @@ import {
   Button,
   Typography,
   TextField,
-  MenuItem,
-  Select,
+  Autocomplete,
   InputLabel,
   FormControl,
+  Select,MenuItem,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
@@ -18,16 +18,15 @@ const IssueAsset = () => {
 
   const [employees, setEmployees] = useState([]);
   const [assets, setAssets] = useState([]);
-  const [assetType, setAssetType] = useState(""); // Store selected asset type
-  const [filteredAssets, setFilteredAssets] = useState([]); // Filtered assets based on asset type
+  const [assetType, setAssetType] = useState("");
+  const [filteredAssets, setFilteredAssets] = useState([]);
   const [formData, setFormData] = useState({
     EmpId: "",
     AssetID: "",
     Status: "Issued",
     Remark: "",
-    IssueDate: new Date().toISOString().split('T')[0], // Automatically set to today's date
+    IssueDate: new Date().toISOString().split('T')[0],
   });
-
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -39,19 +38,18 @@ const IssueAsset = () => {
           "https://namami-infotech.com/NiveshanBackend/api/users/get_users.php"
         );
         const data = await response.json();
-        setEmployees(data.records || []);
+        
+        // Sort employees alphabetically by name
+        const sortedEmployees = (data.records || []).sort((a, b) => 
+          a.Name.localeCompare(b.Name)
+        );
+        setEmployees(sortedEmployees);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
     };
 
-   
-
-    fetchEmployees();
-    fetchAssets();
-    setLoading(false);
-  }, []);
- const fetchAssets = async () => {
+    const fetchAssets = async () => {
       try {
         const response = await fetch(
           "https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php"
@@ -62,16 +60,19 @@ const IssueAsset = () => {
         console.error("Error fetching assets:", error);
       }
     };
-  // Handle form field change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+
+    fetchEmployees();
+    fetchAssets();
+    setLoading(false);
+  }, []);
+
+  const handleChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
 
-  // Handle asset type change
   const handleAssetTypeChange = (e) => {
     const selectedType = e.target.value;
     setAssetType(selectedType);
@@ -84,7 +85,6 @@ const IssueAsset = () => {
     setFilteredAssets(filtered);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitLoading(true);
@@ -100,20 +100,17 @@ const IssueAsset = () => {
         }
       );
       const result = await response.json();
-      console.log(result);
       alert(result.message || "Asset issued successfully");
 
-      // Clear the form after submission
       setFormData({
         EmpId: "",
         AssetID: "",
         Status: "Issued",
         Remark: "",
-        IssueDate: new Date().toISOString().split('T')[0], // Reset IssueDate to today's date
+        IssueDate: new Date().toISOString().split('T')[0],
       });
-      setAssetType(""); // Reset asset type
-      setFilteredAssets([]); // Clear the filtered assets
-       fetchAssets();
+      setAssetType("");
+      setFilteredAssets([]);
     } catch (error) {
       console.error("Error issuing asset:", error);
     } finally {
@@ -135,42 +132,52 @@ const IssueAsset = () => {
           onSubmit={handleSubmit}
           sx={{ display: "grid", gap: "20px", gridTemplateColumns: "auto auto" }}
         >
-          {/* Employee Dropdown */}
-          <FormControl sx={{ width: "400px" }}>
-            <InputLabel>Employee</InputLabel>
-            <Select
-              value={formData.EmpId}
-              name="EmpId"
-              onChange={handleChange}
-              required
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: "400px",
-                  },
+          <Autocomplete
+            options={employees}
+            getOptionLabel={(option) => `${option.Name} (${option.EmpId})`}
+            onChange={(event, newValue) => handleChange("EmpId", newValue ? newValue.EmpId : "")}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Employee"
+                required
+               sx={{
+              
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': {
+                  borderColor: 'white',
                 },
-              }}
-            >
-              {employees.map((employee) => (
-                <MenuItem key={employee.EmpId} value={employee.EmpId}>
-                  {employee.Name} ({employee.EmpId})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+                '&:hover fieldset': {
+                  borderColor: colors.greenAccent[500],
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: colors.greenAccent[600],
+                },
+              },
+            }}
+              />
+            )}
+          />
 
-          {/* Asset Type Dropdown */}
           <FormControl sx={{ width: "400px" }}>
             <InputLabel>Asset Type</InputLabel>
             <Select
               value={assetType}
               onChange={handleAssetTypeChange}
               required
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: "400px",
-                  },
+              sx={{
+                ".MuiOutlinedInput-notchedOutline": {
+                  borderColor: theme.palette.mode === "dark" ? colors.grey[500] : "inherit",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.greenAccent[500],
                 },
               }}
             >
@@ -179,47 +186,77 @@ const IssueAsset = () => {
             </Select>
           </FormControl>
 
-          {/* Asset Dropdown (filtered based on type) */}
-          <FormControl sx={{ width: "400px" }}>
-            <InputLabel>Asset</InputLabel>
-            <Select
-              value={formData.AssetID}
-              name="AssetID"
-              onChange={handleChange}
-              required
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: "400px",
-                  },
+          <Autocomplete
+            options={filteredAssets}
+            getOptionLabel={(option) => `${option.AssetName} (${option.AssetId})`}
+            onChange={(event, newValue) => handleChange("AssetID", newValue ? newValue.AssetId : "")}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Asset"
+                required
+               sx={{
+              
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': {
+                  borderColor: 'white',
                 },
-              }}
-            >
-              {filteredAssets.map((asset) => (
-                <MenuItem key={asset.Id} value={asset.AssetId}>
-                  {asset.AssetName} ({asset.AssetId})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+                '&:hover fieldset': {
+                  borderColor: colors.greenAccent[500],
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: colors.greenAccent[600],
+                },
+              },
+            }}
+              />
+            )}
+          />
 
-          {/* Remark */}
           <TextField
             label="Remark"
             name="Remark"
             value={formData.Remark}
-            onChange={handleChange}
+            onChange={(e) => handleChange("Remark", e.target.value)}
             required
             multiline
             rows={3}
-            sx={{ width: "400px" }}
+           sx={{
+              
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': {
+                  borderColor: 'white',
+                },
+                '&:hover fieldset': {
+                  borderColor: colors.greenAccent[500],
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: colors.greenAccent[600],
+                },
+              },
+            }}
           />
 
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            disabled={submitLoading}
+              disabled={submitLoading}
+              
           >
             {submitLoading ? "Issuing..." : "Issue Asset"}
           </Button>

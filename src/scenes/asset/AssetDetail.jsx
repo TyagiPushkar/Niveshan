@@ -183,6 +183,7 @@ const AssetDetail = () => {
                     <Typography variant="body1"><strong>Employee ID:</strong> {history.EmpId}</Typography>
                     <Typography variant="body1"><strong>Issue Date:</strong> {history.IssueDate}</Typography>
                     <Typography variant="body1"><strong>Accepted Date:</strong> {history.AcceptedDate || "N/A"}</Typography>
+                    <Typography variant="body1"><strong>Return Date:</strong> {history.ReturnDate || "N/A"}</Typography>
                     <Typography variant="body1"><strong>Status:</strong> {history.Status}</Typography>
                     <Typography variant="body1"><strong>Remark:</strong> {history.Remark || "N/A"}</Typography>
                     {history.IsCurrentHolder && (

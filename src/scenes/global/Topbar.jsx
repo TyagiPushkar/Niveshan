@@ -5,7 +5,7 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useNavigate } from "react-router-dom";
-
+import LogoutIcon from '@mui/icons-material/Logout';
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -86,17 +86,18 @@ const Topbar = () => {
 
       {/* ICONS */}
       <Box display="flex">
-        <IconButton onClick={colorMode.toggleColorMode}>
+        {/* <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
             <DarkModeOutlinedIcon />
           ) : (
             <LightModeOutlinedIcon />
           )}
-        </IconButton>
+        </IconButton> */}
 
         <IconButton onClick={handleMenuClick}>
           <PersonOutlinedIcon />
         </IconButton>
+
         {/* Dropdown Menu */}
         <Menu
           anchorEl={anchorEl}
@@ -105,8 +106,11 @@ const Topbar = () => {
         >
           <MenuItem onClick={handleProfile}>Profile</MenuItem>
           <MenuItem onClick={() => setOpenModal(true)}>Change Password</MenuItem>
-          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          {/* <MenuItem onClick={handleLogout}>Logout</MenuItem> */}
         </Menu>
+        <IconButton onClick={handleLogout}>
+          <LogoutIcon />
+        </IconButton>
       </Box>
 
       {/* Modal for Change Password */}
