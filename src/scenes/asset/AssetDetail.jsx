@@ -55,7 +55,7 @@ const AssetDetail = () => {
           },
           body: JSON.stringify({
             AssetID: assetDetail.AssetId,
-            Status: "In stock",
+            Status: "Faulty",
           }),
         }
       );
@@ -160,7 +160,7 @@ const AssetDetail = () => {
           variant="contained"
           color="primary"
           onClick={updateStatusToInStock}
-          disabled={updateLoading || assetDetail.Status === "In stock"}
+          disabled={assetDetail.Status != "In stock"}
         >
           {updateLoading ? "Updating..." : "Mark as Faulty"}
         </Button>
