@@ -52,6 +52,12 @@ const Support = () => {
       headerName: "Employee ID",
       width: 150,
     },
+
+    {
+      field: "Name",
+      headerName: "Employee Name",
+      width: 150,
+    },
     {
       field: "Category",
       headerName: "Category",
@@ -87,6 +93,7 @@ const Support = () => {
     const csvData = ticketData.map(ticket => ({
       "Ticket ID": ticket.id,
       "Employee ID": ticket.EmpId,
+      "Employee Name": ticket.Name,
       "Category": ticket.Category,
       "Status": ticket.Status,
       "Date Created": ticket.DateTime,

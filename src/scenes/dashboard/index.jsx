@@ -38,8 +38,7 @@ const Dashboard = () => {
 
         const statusCounts = {
           Live: 0,
-          Faulty: 0,
-          "In Stock": 0,
+          Faulty: 0
         };
 
         filteredAssets.forEach((asset) => {
@@ -70,8 +69,7 @@ const Dashboard = () => {
 
     const statusCounts = {
       Live: 0,
-      Faulty: 0,
-      "In Stock": 0,
+      Faulty: 0
     };
 
     filteredAssets.forEach((asset) => {
