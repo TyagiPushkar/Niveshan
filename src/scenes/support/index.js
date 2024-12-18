@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
-import Devices from "@mui/icons-material/Devices";
 import Header from "../../components/Header";
 import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
@@ -17,6 +16,14 @@ const Support = () => {
   const [ticketData, setTicketData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
+ 
+  const location = useLocation();
+ 
+
+  // Get query parameters to filter by status
+  const queryParams = new URLSearchParams(location.search);
+  const filterStatus = queryParams.get("status");
   // Fetch user details from localStorage
   const userDetails = JSON.parse(localStorage.getItem('userDetails'));
   const isAdmin = userDetails?.Role === 'Admin';

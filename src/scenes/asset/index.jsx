@@ -1,14 +1,21 @@
-// Importing necessary dependencies
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, Button, useTheme, Modal, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  useTheme,
+  Modal,
+  Grid,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import Devices from "@mui/icons-material/Devices";
 import Header from "../../components/Header";
-import Papa from 'papaparse';
-import { saveAs } from 'file-saver';
-import SummarizeIcon from '@mui/icons-material/Summarize';
+import Papa from "papaparse";
+import { saveAs } from "file-saver";
+import SummarizeIcon from "@mui/icons-material/Summarize";
 
 const Asset = () => {
   const theme = useTheme();
@@ -17,6 +24,10 @@ const Asset = () => {
   const [assetData, setAssetData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [assetIdFilter, setAssetIdFilter] = useState("");
+  const [assetNameFilter, setAssetNameFilter] = useState("");
+  const [assetTypeFilter, setAssetTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
 
@@ -24,7 +35,9 @@ const Asset = () => {
   useEffect(() => {
     const fetchAssetData = async () => {
       try {
-        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php");
+        const response = await fetch(
+          "https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php"
+        );
         const data = await response.json();
         setAssetData(data.data);
         setLoading(false);
@@ -53,16 +66,16 @@ const Asset = () => {
       width: 200,
       renderCell: (params) => (
         <Box display="flex" justifyContent="space-between" width="100%">
-          <Button 
-            onClick={() => handleViewClick(params.row.AssetId)} 
-            variant="outlined" 
+          <Button
+            onClick={() => handleViewClick(params.row.AssetId)}
+            variant="outlined"
             color="secondary"
           >
             View
           </Button>
-          <Button 
-            onClick={() => handleEditClick(params.row)} 
-            variant="outlined" 
+          <Button
+            onClick={() => handleEditClick(params.row)}
+            variant="outlined"
             color="secondary"
           >
             Edit
@@ -97,13 +110,16 @@ const Asset = () => {
 
   const handleUpdateAsset = async () => {
     try {
-      const response = await fetch(`https://namami-infotech.com/NiveshanBackend/api/assets/edit_asset.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(selectedAsset),
-      });
+      const response = await fetch(
+        `https://namami-infotech.com/NiveshanBackend/api/assets/edit_asset.php`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(selectedAsset),
+        }
+      );
       if (response.ok) {
         handleModalClose();
         alert("Asset updated successfully!");
@@ -116,33 +132,39 @@ const Asset = () => {
   };
 
   const exportCSV = () => {
-    const csvData = assetData.map(asset => ({
+    const csvData = assetData.map((asset) => ({
       "Asset ID": asset.AssetId,
-      "Type": asset.AssetType,
-      "Name": asset.AssetName,
-      "Condition": asset.AssetCondition,
-      "Make": asset.Make,
-      "Model": asset.Model,
+      Type: asset.AssetType,
+      Name: asset.AssetName,
+      Condition: asset.AssetCondition,
+      Make: asset.Make,
+      Model: asset.Model,
       "S/No.": asset.SerialNo,
-      "Vendor": asset.VendorName,
-      "Status": asset.Status,
-      "MacAddress": asset.MacAddress,
-      "Processor": asset.Processor,
-      "Warranty": asset.Warranty,
-      "RAM": asset.RAM,
-      "Harddisk": asset.Harddisk,
+      Vendor: asset.VendorName,
+      Status: asset.Status,
+      MacAddress: asset.MacAddress,
+      Processor: asset.Processor,
+      Warranty: asset.Warranty,
+      RAM: asset.RAM,
+      Harddisk: asset.Harddisk,
     }));
 
     const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, 'assets_report.csv');
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "assets_report.csv");
   };
 
-  const filteredAssets = assetData.filter((asset) =>
-    asset.AssetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.AssetType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.Status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.AssetId.toString().includes(searchTerm)
+  // Apply multi-filtering logic
+  const filteredAssets = assetData.filter(
+    (asset) =>
+      (asset.AssetId.toString().includes(assetIdFilter) ||
+        assetIdFilter === "") &&
+      (asset.AssetName.toLowerCase().includes(assetNameFilter.toLowerCase()) ||
+        assetNameFilter === "") &&
+      (asset.AssetType.toLowerCase().includes(assetTypeFilter.toLowerCase()) ||
+        assetTypeFilter === "") &&
+      (asset.Status.toLowerCase().includes(statusFilter.toLowerCase()) ||
+        statusFilter === "")
   );
 
   return (
@@ -150,7 +172,7 @@ const Asset = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="ASSETS" subtitle="Managing the Assets" />
         <Box mt={2} mb={2}>
-          <TextField
+          {/* <TextField
             label="Search assets..."
             variant="outlined"
             fullWidth
@@ -165,7 +187,69 @@ const Asset = () => {
                 backgroundColor: colors.primary[400],
               },
             }}
-          />
+          /> */}
+          <Box display="flex" gap="15px" mt={2}>
+            <TextField
+              label="Asset ID"
+              variant="outlined"
+              value={assetIdFilter}
+              onChange={(e) => setAssetIdFilter(e.target.value)}
+              InputLabelProps={{
+                style: { color: colors.grey[100] },
+              }}
+              InputProps={{
+                style: {
+                  color: colors.grey[100],
+                  backgroundColor: colors.primary[400],
+                },
+              }}
+            />
+            <TextField
+              label="Asset Name"
+              variant="outlined"
+              value={assetNameFilter}
+              onChange={(e) => setAssetNameFilter(e.target.value)}
+              InputLabelProps={{
+                style: { color: colors.grey[100] },
+              }}
+              InputProps={{
+                style: {
+                  color: colors.grey[100],
+                  backgroundColor: colors.primary[400],
+                },
+              }}
+            />
+            <TextField
+              label="Asset Type"
+              variant="outlined"
+              value={assetTypeFilter}
+              onChange={(e) => setAssetTypeFilter(e.target.value)}
+              InputLabelProps={{
+                style: { color: colors.grey[100] },
+              }}
+              InputProps={{
+                style: {
+                  color: colors.grey[100],
+                  backgroundColor: colors.primary[400],
+                },
+              }}
+            />
+            <TextField
+              label="Status"
+              variant="outlined"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              InputLabelProps={{
+                style: { color: colors.grey[100] },
+              }}
+              InputProps={{
+                style: {
+                  color: colors.grey[100],
+                  backgroundColor: colors.primary[400],
+                },
+              }}
+            />
+          </Box>
         </Box>
         <Box display="flex" gap="10px">
           <Box
@@ -227,56 +311,68 @@ const Asset = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={filteredAssets.map((item, index) => ({ ...item, id: index + 1 }))}
+          rows={filteredAssets.map((item, index) => ({
+            ...item,
+            id: index + 1,
+          }))}
           columns={columns}
           loading={loading}
-          sx={{ cursor: 'pointer' }}
+          sx={{ cursor: "pointer" }}
         />
       </Box>
 
       {/* Edit Modal */}
       <Modal open={open} onClose={handleModalClose}>
-        <Box sx={{
-          width: 500,
-          bgcolor: colors.primary[500],
-          padding: 3,
-          borderRadius: 2,
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px', // Spacing between inputs
-        }}>
+        <Box
+          sx={{
+            width: 500,
+            bgcolor: colors.primary[500],
+            padding: 3,
+            borderRadius: 2,
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px", // Spacing between inputs
+          }}
+        >
           <Typography variant="h6" component="h2" color={colors.grey[100]}>
             Edit Asset
           </Typography>
           {selectedAsset && (
-            <Grid container spacing={1} sx={{ display: 'flex', flexWrap: 'wrap' }}>
-              {Object.keys(selectedAsset).map((key) => (
-                key !== "AssetId" && (
-                  <Grid item xs={3} key={key}> {/* Each field takes up 3 out of 12 columns */}
-                    <TextField
-                      name={key}
-                      label={key}
-                      value={selectedAsset[key]}
-                      onChange={handleInputChange}
-                      fullWidth
-                      margin="normal"
-                      InputLabelProps={{
-                        style: { color: colors.grey[100] },
-                      }}
-                      InputProps={{
-                        style: {
-                          color: colors.grey[100],
-                          backgroundColor: colors.primary[400],
-                        },
-                      }}
-                    />
-                  </Grid>
-                )
-              ))}
+            <Grid
+              container
+              spacing={1}
+              sx={{ display: "flex", flexWrap: "wrap" }}
+            >
+              {Object.keys(selectedAsset).map(
+                (key) =>
+                  key !== "AssetId" && (
+                    <Grid item xs={3} key={key}>
+                      {" "}
+                      {/* Each field takes up 3 out of 12 columns */}
+                      <TextField
+                        name={key}
+                        label={key}
+                        value={selectedAsset[key]}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        InputLabelProps={{
+                          style: { color: colors.grey[100] },
+                        }}
+                        InputProps={{
+                          style: {
+                            color: colors.grey[100],
+                            backgroundColor: colors.primary[400],
+                          },
+                        }}
+                      />
+                    </Grid>
+                  )
+              )}
               <Grid item xs={12}>
                 <Box display="flex" justifyContent="flex-end" mt={2}>
                   <Button
