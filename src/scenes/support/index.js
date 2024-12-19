@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import Papa from 'papaparse';
@@ -17,14 +17,6 @@ const Support = () => {
   const [loading, setLoading] = useState(true);
 
 
- 
-  const location = useLocation();
- 
-
-  // Get query parameters to filter by status
-  const queryParams = new URLSearchParams(location.search);
-  const filterStatus = queryParams.get("status");
-  // Fetch user details from localStorage
   const userDetails = JSON.parse(localStorage.getItem('userDetails'));
   const isAdmin = userDetails?.Role === 'Admin';
   const empId = userDetails?.EmpId;
@@ -35,7 +27,6 @@ const Support = () => {
       try {
         let url = "https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php";
         if (!isAdmin) {
-          // If not admin, fetch only the tickets for the specific employee
           url += `?EmpId=${empId}`;
         }
 
@@ -120,7 +111,6 @@ const Support = () => {
         
         <Box display="flex" gap="10px">
           <Box
-           
             p="5px"
             display="flex"
             justifyContent="center"
@@ -182,7 +172,7 @@ const Support = () => {
       >
         <DataGrid
           checkboxSelection
-          rows={ticketData} // Use the actual ticket data
+          rows={ticketData} 
           columns={columns}
           loading={loading}
           onRowClick={handleRowClick}

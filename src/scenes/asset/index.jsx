@@ -23,7 +23,6 @@ const Asset = () => {
   const colors = tokens(theme.palette.mode);
   const [assetData, setAssetData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [assetIdFilter, setAssetIdFilter] = useState("");
   const [assetNameFilter, setAssetNameFilter] = useState("");
   const [assetTypeFilter, setAssetTypeFilter] = useState("");
@@ -147,6 +146,7 @@ const Asset = () => {
       Warranty: asset.Warranty,
       RAM: asset.RAM,
       Harddisk: asset.Harddisk,
+      AddOn: new Date(asset.AddDateTime).toLocaleDateString(),
     }));
 
     const csv = Papa.unparse(csvData);
