@@ -1,5 +1,13 @@
-import { Box, Typography, useTheme, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useTheme,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
@@ -10,6 +18,7 @@ import PieChart from "../../components/PieChart";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState({
     assetStats: {},
     ticketStats: {},
@@ -22,7 +31,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/Dashboard/dashboard.php");
+        const response = await fetch(
+          "https://namami-infotech.com/NiveshanBackend/api/Dashboard/dashboard.php"
+        );
         const data = await response.json();
         setDashboardData(data);
 
@@ -35,7 +46,7 @@ const Dashboard = () => {
 
         const statusCounts = {
           Live: 0,
-          Faulty: 0
+          Faulty: 0,
         };
 
         filteredAssets.forEach((asset) => {
@@ -66,7 +77,7 @@ const Dashboard = () => {
 
     const statusCounts = {
       Live: 0,
-      Faulty: 0
+      Faulty: 0,
     };
 
     filteredAssets.forEach((asset) => {
@@ -82,7 +93,13 @@ const Dashboard = () => {
     setPieChartData(pieData);
   };
 
-  const assetNames = [...new Set(dashboardData.assetDetails.map(asset => asset.AssetName))];
+  const assetNames = [
+    ...new Set(dashboardData.assetDetails.map((asset) => asset.AssetName)),
+  ];
+
+  const openTickets = dashboardData.ticketDetails.filter(
+    (ticket) => ticket.Status === "Open"
+  );
 
   return (
     <Box m="20px">
@@ -97,29 +114,60 @@ const Dashboard = () => {
         gap="20px"
         mt="20px"
       >
-      
         <StatBox
           title={dashboardData.assetStats.totalAssets || 0}
           subtitle="Total Assets"
-          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 30 }} />}
+          icon={
+            <PointOfSaleIcon
+              sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+            />
+          }
         />
         <StatBox
           title={dashboardData.assetStats.liveAssets || 0}
           subtitle="Live Assets"
-          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 30 }} />}
+          icon={
+            <PointOfSaleIcon
+              sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+            />
+          }
         />
         <StatBox
           title={dashboardData.assetStats.inStockAssets || 0}
           subtitle="In Stock Assets"
-          icon={<PointOfSaleIcon sx={{ color: colors.greenAccent[600], fontSize: 30 }} />}
+          icon={
+            <PointOfSaleIcon
+              sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+            />
+          }
         />
       </Box>
 
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="120px" gap="20px" mt="20px">
-        <Box gridColumn="span 8" gridRow="span 3" backgroundColor={colors.primary[400]}>
-          <Box mt="25px" p="0 30px" display="flex" justifyContent="space-between" alignItems="center">
+      <Box
+        display="grid"
+        gridTemplateColumns="repeat(12, 1fr)"
+        gridAutoRows="120px"
+        gap="20px"
+        mt="20px"
+      >
+        <Box
+          gridColumn="span 8"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Box>
-              <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.grey[100]}
+              >
                 Asset Distribution
               </Typography>
               <Select
@@ -127,7 +175,9 @@ const Dashboard = () => {
                 onChange={handleAssetNameChange}
                 displayEmpty
               >
-                <MenuItem value="" disabled>Select Asset Name</MenuItem>
+                <MenuItem value="" disabled>
+                  Select Asset Name
+                </MenuItem>
                 {assetNames.length > 0 ? (
                   assetNames.map((name) => (
                     <MenuItem key={name} value={name}>
@@ -140,32 +190,76 @@ const Dashboard = () => {
               </Select>
             </Box>
           </Box>
-          <Box height="300px" m="-20px 0 0 0"> 
+          <Box height="300px" m="-20px 0 0 0">
             <PieChart pieData={pieChartData} />
           </Box>
         </Box>
 
-        <Box gridColumn="span 4" gridRow="span 3" backgroundColor={colors.primary[400]}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" borderBottom={`4px solid ${colors.primary[500]}`} colors={colors.grey[100]} p="15px">
+        <Box
+          gridColumn="span 4"
+          gridRow="span 3"
+          backgroundColor={colors.primary[400]}
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom={`4px solid ${colors.primary[500]}`}
+            colors={colors.grey[100]}
+            p="15px"
+          >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-               Tickets
+              Tickets
             </Typography>
           </Box>
-           <StatBox
-          title={dashboardData.ticketStats.totalTickets || 0}
-          subtitle="Total Tickets"
-          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
-        />
-        <StatBox
-          title={dashboardData.ticketStats.openTickets || 0}
-          subtitle="Open Tickets"
-          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
-        />
-        <StatBox
-          title={dashboardData.ticketStats.resolvedTickets || 0}
-          subtitle="Resolved Tickets"
-          icon={<EmailIcon sx={{ color: colors.greenAccent[600], fontSize: 40 }} />}
-        />
+          <StatBox
+            title={
+              <Link
+                to="/support-ticket"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {dashboardData.ticketStats.totalTickets || 0}
+              </Link>
+            }
+            subtitle="Total Tickets"
+            icon={
+              <EmailIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 40 }}
+              />
+            }
+          />
+          <StatBox
+            title={
+              <Link
+                to="/support-ticket?status=Open"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {dashboardData.ticketStats.openTickets || 0}
+              </Link>
+            }
+            subtitle="Open Tickets"
+            icon={
+              <EmailIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 40 }}
+              />
+            }
+          />
+          <StatBox
+            title={
+              <Link
+                to="/support-ticket?status=Resolved"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {dashboardData.ticketStats.resolvedTickets || 0}
+              </Link>
+            }
+            subtitle="Resolved Tickets"
+            icon={
+              <EmailIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 40 }}
+              />
+            }
+          />
         </Box>
       </Box>
     </Box>

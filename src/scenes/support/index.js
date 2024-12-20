@@ -8,6 +8,7 @@ import Papa from 'papaparse';
 import { saveAs } from 'file-saver';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import { useLocation } from "react-router-dom";
 
 const Support = () => {
   const theme = useTheme();
@@ -15,24 +16,30 @@ const Support = () => {
   const colors = tokens(theme.palette.mode);
   const [ticketData, setTicketData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+const location = useLocation(); // Get current location
+  const queryParams = new URLSearchParams(location.search);
+  const statusFilter = queryParams.get("status"); // Extract 'status' query parameter
 
   const userDetails = JSON.parse(localStorage.getItem('userDetails'));
   const isAdmin = userDetails?.Role === 'Admin';
   const empId = userDetails?.EmpId;
 
-  // Fetch data from the API
-  useEffect(() => {
+ useEffect(() => {
     const fetchTicketData = async () => {
       try {
         let url = "https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php";
         if (!isAdmin) {
           url += `?EmpId=${empId}`;
         }
-
         const response = await fetch(url);
         const data = await response.json();
-        setTicketData(data); // Assuming the tickets data is returned as an array
+
+        // Filter tickets if statusFilter is applied
+        const filteredData = statusFilter
+          ? data.filter((ticket) => ticket.Status === statusFilter)
+          : data;
+
+        setTicketData(filteredData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching ticket data:", error);
@@ -41,7 +48,7 @@ const Support = () => {
     };
 
     fetchTicketData();
-  }, [isAdmin, empId]);
+  }, [isAdmin, empId, statusFilter]);
 
   const columns = [
     { field: "id", headerName: "Ticket ID", width: 120 },
