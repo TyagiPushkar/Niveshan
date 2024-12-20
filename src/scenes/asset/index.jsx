@@ -16,6 +16,7 @@ import Header from "../../components/Header";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
 import SummarizeIcon from "@mui/icons-material/Summarize";
+import { useLocation } from "react-router-dom";
 
 const Asset = () => {
   const theme = useTheme();
@@ -29,6 +30,21 @@ const Asset = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
+const location = useLocation();
+useEffect(() => {
+  const queryParams = new URLSearchParams(location.search);
+  const statusQuery = queryParams.get("status");
+  const AssetNameQuery = queryParams.get("AssetName");
+
+  if (statusQuery) {
+    setStatusFilter(statusQuery);
+  }
+
+  if (AssetNameQuery) {
+    setAssetNameFilter(AssetNameQuery); // Corrected to set assetNameFilter
+  }
+}, [location.search]);
+
 
   // Fetch data from the API
   useEffect(() => {
@@ -155,17 +171,18 @@ const Asset = () => {
   };
 
   // Apply multi-filtering logic
-  const filteredAssets = assetData.filter(
-    (asset) =>
-      (asset.AssetId.toString().includes(assetIdFilter) ||
-        assetIdFilter === "") &&
-      (asset.AssetName.toLowerCase().includes(assetNameFilter.toLowerCase()) ||
-        assetNameFilter === "") &&
-      (asset.AssetType.toLowerCase().includes(assetTypeFilter.toLowerCase()) ||
-        assetTypeFilter === "") &&
-      (asset.Status.toLowerCase().includes(statusFilter.toLowerCase()) ||
-        statusFilter === "")
-  );
+ const filteredAssets = assetData.filter(
+   (asset) =>
+     (asset.AssetId.toString().includes(assetIdFilter) ||
+       assetIdFilter === "") &&
+     (asset.AssetName.toLowerCase().includes(assetNameFilter.toLowerCase()) ||
+       assetNameFilter === "") &&
+     (asset.AssetType.toLowerCase().includes(assetTypeFilter.toLowerCase()) ||
+       assetTypeFilter === "") &&
+     (asset.Status.toLowerCase().includes(statusFilter.toLowerCase()) ||
+       statusFilter === "")
+ );
+
 
   return (
     <Box m="20px">

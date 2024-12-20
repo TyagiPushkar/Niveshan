@@ -114,33 +114,59 @@ const Dashboard = () => {
         gap="20px"
         mt="20px"
       >
-        <StatBox
-          title={dashboardData.assetStats.totalAssets || 0}
-          subtitle="Total Assets"
-          icon={
-            <PointOfSaleIcon
-              sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-            />
-          }
-        />
-        <StatBox
-          title={dashboardData.assetStats.liveAssets || 0}
-          subtitle="Live Assets"
-          icon={
-            <PointOfSaleIcon
-              sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-            />
-          }
-        />
-        <StatBox
-          title={dashboardData.assetStats.inStockAssets || 0}
-          subtitle="In Stock Assets"
-          icon={
-            <PointOfSaleIcon
-              sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-            />
-          }
-        />
+        <Box onClick={() => navigate("/asset")} sx={{ cursor: "pointer" }}>
+          <StatBox
+            title={dashboardData.assetStats.totalAssets || 0}
+            subtitle="Total Assets"
+            icon={
+              <PointOfSaleIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+              />
+            }
+          />
+        </Box>
+        <Box
+          onClick={() => navigate("/asset?status=Live")}
+          sx={{ cursor: "pointer" }}
+        >
+          <StatBox
+            title={dashboardData.assetStats.liveAssets || 0}
+            subtitle="Live Assets"
+            icon={
+              <PointOfSaleIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+              />
+            }
+          />
+        </Box>
+        <Box
+          onClick={() => navigate("/asset?status=In Stock")}
+          sx={{ cursor: "pointer" }}
+        >
+          <StatBox
+            title={dashboardData.assetStats.inStockAssets || 0}
+            subtitle="In Stock Assets"
+            icon={
+              <PointOfSaleIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+              />
+            }
+          />
+        </Box>
+        <Box
+          onClick={() => navigate("/asset?status=Faulty")}
+          sx={{ cursor: "pointer" }}
+        >
+          <StatBox
+            title={dashboardData.assetStats.faultyAssets || 0}
+            subtitle="Faulty Assets"
+            icon={
+              <PointOfSaleIcon
+                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
+              />
+            }
+          />
+        </Box>
       </Box>
 
       <Box
@@ -191,7 +217,10 @@ const Dashboard = () => {
             </Box>
           </Box>
           <Box height="300px" m="-20px 0 0 0">
-            <PieChart pieData={pieChartData} />
+            <PieChart
+              pieData={pieChartData}
+              assetDetails={dashboardData.assetDetails}
+            />
           </Box>
         </Box>
 
