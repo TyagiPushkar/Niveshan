@@ -156,6 +156,7 @@ useEffect(() => {
       Model: asset.Model,
       "S/No.": asset.SerialNo,
       Vendor: asset.VendorName,
+      InvoiceDate: asset.InvoiceDate,
       Status: asset.Status,
       MacAddress: asset.MacAddress,
       Processor: asset.Processor,
