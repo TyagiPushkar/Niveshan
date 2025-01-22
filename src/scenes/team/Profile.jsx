@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Grid, useTheme, IconButton, Menu, MenuItem } from "@mui/material";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import {
+  Box,
+  Typography,
+  Grid,
+  useTheme,
+  IconButton,
+  Menu,
+  MenuItem,
+  Modal,
+  CircularProgress,
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 
@@ -13,6 +23,9 @@ const Profile = () => {
   const [assetsLoading, setAssetsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null); // For handling the menu
   const [currentAsset, setCurrentAsset] = useState(null); // To keep track of the selected asset
+  const [modalOpen, setModalOpen] = useState(false); // To control modal visibility
+  const [assetDetails, setAssetDetails] = useState(null); // To store fetched asset details
+  const [detailsLoading, setDetailsLoading] = useState(false); // To handle loading state for asset details
 
   // Fetch EmpId from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
@@ -74,38 +87,20 @@ const Profile = () => {
     setCurrentAsset(null);
   };
 
-  // Function to handle status update
-  const handleStatusChange = async (newStatus) => {
-    if (!currentAsset) return;
-
+  // Function to fetch asset details and open the modal
+  const handleAssetClick = async (assetId) => {
+    setDetailsLoading(true);
+    setModalOpen(true); // Open the modal
     try {
       const response = await fetch(
-        "https://namami-infotech.com/NiveshanBackend/api/assets/update_issue_status.php",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            AssetID: currentAsset.AssetID,
-            Status: newStatus,
-          }),
-        }
+        `https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php?AssetId=${assetId}`
       );
       const data = await response.json();
-      if (data.message) {
-        console.log("Status updated:", data.message);
-        // Update the asset status in the state
-        const updatedAssets = assetsData.map((asset) =>
-          asset.AssetID === currentAsset.AssetID ? { ...asset, Status: newStatus } : asset
-        );
-        setAssetsData(updatedAssets);
-        handleMenuClose(); // Close the menu after status update
-      } else {
-        console.error("Error updating status:", data.message);
-      }
+      setAssetDetails(data.data[0]);
     } catch (error) {
-      console.error("Failed to update asset status:", error);
+      console.error("Error fetching asset details:", error);
+    } finally {
+      setDetailsLoading(false);
     }
   };
 
@@ -119,14 +114,24 @@ const Profile = () => {
 
   return (
     <Box m="20px">
-      <Header title="Employee Details" subtitle={`Details for EmpId: ${EmpId}`} />
-      <Box mt="20px" p="20px" backgroundColor={colors.primary[400]} borderRadius="8px">
+      <Header
+        title="Employee Details"
+        subtitle={`Details for EmpId: ${EmpId}`}
+      />
+      <Box
+        mt="20px"
+        p="20px"
+        backgroundColor={colors.primary[400]}
+        borderRadius="8px"
+      >
         <Typography variant="h6">Name: {employeeData.Name}</Typography>
         <Typography variant="h6">Mobile: {employeeData.Mobile}</Typography>
         <Typography variant="h6">Email: {employeeData.Email}</Typography>
         <Typography variant="h6">Designation: {employeeData.Role}</Typography>
         <Typography variant="h6">Status: {employeeData.Status}</Typography>
-        <Typography variant="h6">Date of Joining: {employeeData.DateOfJoining}</Typography>
+        <Typography variant="h6">
+          Date of Joining: {employeeData.DateOfJoining}
+        </Typography>
       </Box>
 
       {/* Issued Assets Section */}
@@ -141,29 +146,31 @@ const Profile = () => {
           <Grid container spacing={3}>
             {assetsData.map((asset, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Box p="20px" backgroundColor={colors.blueAccent[700]} borderRadius="8px">
-                        <Box display="flex" justifyContent="space-between">
-                            
-                            <div>
-                                <Typography variant="subtitle1">Asset ID: {asset.AssetID}</Typography>
-                  <Typography variant="subtitle1">Asset Name: {asset.AssetName}</Typography>
-                  <Typography variant="subtitle1">Status: {asset.Status}</Typography>
-                  <Typography variant="subtitle1">Issue Date: {asset.IssueDate}</Typography>
-                  <Typography variant="subtitle1">Accepted / Rejected Date: {asset.AcceptedDate}</Typography>
-                  <Typography variant="subtitle1">Remark: {asset.Remark}</Typography>
-                            </div>
-                             {asset.Status === "Issued" && (
-                    <IconButton
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                                    onClick={(event) => handleMenuClick(event, asset)}
-                                   style={{marginBottom:"100px"}}
-                    >
-                      <MoreVertIcon sx={{ color: colors.grey[100] }} />
-                    </IconButton>
-                            )}
-                         </Box>
-                 
+                <Box
+                  p="20px"
+                  backgroundColor={colors.blueAccent[700]}
+                  borderRadius="8px"
+                  onClick={() => handleAssetClick(asset.AssetID)} // Fetch details and open modal
+                  style={{ cursor: "pointer" }}
+                >
+                  <Typography variant="subtitle1">
+                    Asset ID: {asset.AssetID}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Asset Name: {asset.AssetName}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Status: {asset.Status}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Issue Date: {asset.IssueDate}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Accepted / Rejected Date: {asset.AcceptedDate}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    Remark: {asset.Remark}
+                  </Typography>
                 </Box>
               </Grid>
             ))}
@@ -173,19 +180,43 @@ const Profile = () => {
         )}
       </Box>
 
-      {/* Menu for Accept/Reject options */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={() => handleStatusChange("Accepted")} disabled={currentAsset?.Status !== "Issued"}>
-          Accept
-        </MenuItem>
-        <MenuItem onClick={() => handleStatusChange("Rejected")} disabled={currentAsset?.Status !== "Issued"}>
-          Reject
-        </MenuItem>
-      </Menu>
+      {/* Modal for Asset Details */}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box
+          p="20px"
+          m="20px auto"
+          maxWidth="600px"
+          backgroundColor={colors.primary[400]}
+          borderRadius="8px"
+          style={{
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            position: "absolute",
+          }}
+        >
+          {detailsLoading ? (
+            <CircularProgress />
+          ) : assetDetails ? (
+            <>
+              <Typography variant="h6">Asset Details</Typography>
+              <Typography>Asset ID: {assetDetails.AssetId}</Typography>
+              <Typography>Asset Name: {assetDetails.AssetName}</Typography>
+              <Typography>Type: {assetDetails.AssetType}</Typography>
+              <Typography>Condition: {assetDetails.AssetCondition}</Typography>
+              <Typography>Make: {assetDetails.Make}</Typography>
+              <Typography>Model: {assetDetails.Model}</Typography>
+              <Typography>Serial No: {assetDetails.SerialNo}</Typography>
+              <Typography>Processor: {assetDetails.Processor}</Typography>
+              <Typography>RAM: {assetDetails.RAM}</Typography>
+              <Typography>Harddisk: {assetDetails.Harddisk}</Typography>
+              <Typography>Status: {assetDetails.Status}</Typography>
+            </>
+          ) : (
+            <Typography>Failed to load asset details.</Typography>
+          )}
+        </Box>
+      </Modal>
     </Box>
   );
 };

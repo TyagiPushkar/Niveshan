@@ -33,6 +33,7 @@ const Team = () => {
     Mobile: "",
     Email: "",
     Role: "",
+    Functions:"",
     Status: "",
   });
 
@@ -140,12 +141,14 @@ const Team = () => {
     const mobile = item.Mobile || ""; // Default to an empty string if null
     const email = item.Email || ""; // Default to an empty string if null
     const role = item.Role || ""; // Default to an empty string if null
+    const functions = item.Functions || "";
 
     return (
       name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       mobile.toLowerCase().includes(searchTerm.toLowerCase()) ||
       email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      role.toLowerCase().includes(searchTerm.toLowerCase())
+      role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      functions.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
 
@@ -279,6 +282,15 @@ const Team = () => {
             margin="dense"
             value={editData.Role}
             onChange={(e) => setEditData({ ...editData, Role: e.target.value })}
+          />
+          <TextField
+            label="Department"
+            fullWidth
+            margin="dense"
+            value={editData.Functions}
+            onChange={(e) =>
+              setEditData({ ...editData, Functions: e.target.value })
+            }
           />
           <Box mt={2}>
             <Button
