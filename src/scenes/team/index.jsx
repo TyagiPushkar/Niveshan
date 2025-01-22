@@ -186,21 +186,41 @@ const Team = () => {
 
   return (
     <Box m="20px">
-      <Header title="TEAM" subtitle="Managing the Team Members" />
-      <Box mt={2} mb={2}>
-        <TextField
-          label="Search team..."
-          variant="outlined"
-          fullWidth
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            style: {
-              color: colors.grey[100],
-              backgroundColor: colors.primary[400],
-            },
-          }}
-        />
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="TEAM" subtitle="Managing the Team Members" />
+        <Box mt={2} mb={2}>
+          <TextField
+            label="Search team..."
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputLabelProps={{
+              style: { color: colors.grey[100] }, // White text color for label
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100], // White text color for input
+                backgroundColor: colors.primary[400], // Dark background
+              },
+            }}
+          />
+        </Box>
+        <Box
+          width="20%"
+          p="5px"
+          display="flex"
+          justifyContent="center"
+          backgroundColor={colors.greenAccent[600]}
+          borderRadius="4px"
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigate("/add-employee")}
+        >
+          <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
+            Add New
+          </Typography>
+          <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
+        </Box>
       </Box>
       <Box
         m="10px 0 0 0"
