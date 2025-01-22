@@ -8,7 +8,6 @@ import {
   Menu,
   MenuItem,
   Modal,
-  CircularProgress,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { tokens } from "../../theme";
@@ -21,17 +20,14 @@ const Profile = () => {
   const [assetsData, setAssetsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [assetsLoading, setAssetsLoading] = useState(true);
-  const [anchorEl, setAnchorEl] = useState(null); // For handling the menu
-  const [currentAsset, setCurrentAsset] = useState(null); // To keep track of the selected asset
-  const [modalOpen, setModalOpen] = useState(false); // To control modal visibility
-  const [assetDetails, setAssetDetails] = useState(null); // To store fetched asset details
-  const [detailsLoading, setDetailsLoading] = useState(false); // To handle loading state for asset details
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [currentAsset, setCurrentAsset] = useState(null); // Track selected asset
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [assetDetails, setAssetDetails] = useState(null); // Details for modal
 
-  // Fetch EmpId from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  const EmpId = userDetails ? userDetails.EmpId : ""; // Fallback to empty if not found
+  const EmpId = userDetails ? userDetails.EmpId : "";
 
-  // Fetch employee data by EmpId
   useEffect(() => {
     const fetchEmployeeData = async () => {
       if (!EmpId) {
@@ -75,22 +71,8 @@ const Profile = () => {
     fetchAssetsData();
   }, [EmpId]);
 
-  // Handle menu open
-  const handleMenuClick = (event, asset) => {
-    setAnchorEl(event.currentTarget);
-    setCurrentAsset(asset); // Store the selected asset
-  };
-
-  // Handle menu close
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setCurrentAsset(null);
-  };
-
-  // Function to fetch asset details and open the modal
-  const handleAssetClick = async (assetId) => {
-    setDetailsLoading(true);
-    setModalOpen(true); // Open the modal
+  // Fetch asset details for modal
+  const fetchAssetDetails = async (assetId) => {
     try {
       const response = await fetch(
         `https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php?AssetId=${assetId}`
@@ -99,8 +81,62 @@ const Profile = () => {
       setAssetDetails(data.data[0]);
     } catch (error) {
       console.error("Error fetching asset details:", error);
-    } finally {
-      setDetailsLoading(false);
+    }
+  };
+
+  // Open modal and fetch details
+  const handleAssetClick = (assetId) => {
+    setIsModalOpen(true);
+    fetchAssetDetails(assetId);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setAssetDetails(null);
+  };
+
+  const handleMenuClick = (event, asset) => {
+    setAnchorEl(event.currentTarget);
+    setCurrentAsset(asset);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setCurrentAsset(null);
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    if (!currentAsset) return;
+
+    try {
+      const response = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/update_issue_status.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            AssetID: currentAsset.AssetID,
+            Status: newStatus,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (data.message) {
+        console.log("Status updated:", data.message);
+        const updatedAssets = assetsData.map((asset) =>
+          asset.AssetID === currentAsset.AssetID
+            ? { ...asset, Status: newStatus }
+            : asset
+        );
+        setAssetsData(updatedAssets);
+        handleMenuClose();
+      } else {
+        console.error("Error updating status:", data.message);
+      }
+    } catch (error) {
+      console.error("Failed to update asset status:", error);
     }
   };
 
@@ -134,7 +170,6 @@ const Profile = () => {
         </Typography>
       </Box>
 
-      {/* Issued Assets Section */}
       <Box mt="20px">
         <Typography variant="h6" mb="10px">
           Issued Assets
@@ -150,27 +185,40 @@ const Profile = () => {
                   p="20px"
                   backgroundColor={colors.blueAccent[700]}
                   borderRadius="8px"
-                  onClick={() => handleAssetClick(asset.AssetID)} // Fetch details and open modal
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: "pointer", position: "relative" }}
+                  onClick={() => handleAssetClick(asset.AssetID)} // Open modal for asset details
                 >
-                  <Typography variant="subtitle1">
-                    Asset ID: {asset.AssetID}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Asset Name: {asset.AssetName}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Status: {asset.Status}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Issue Date: {asset.IssueDate}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Accepted / Rejected Date: {asset.AcceptedDate}
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Remark: {asset.Remark}
-                  </Typography>
+                  <Box display="flex" justifyContent="space-between">
+                    <div>
+                      <Typography variant="subtitle1">
+                        Asset ID: {asset.AssetID}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Asset Name: {asset.AssetName}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Status: {asset.Status}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Issue Date: {asset.IssueDate}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Remark: {asset.Remark}
+                      </Typography>
+                    </div>
+                    {asset.Status === "Issued" && (
+                      <IconButton
+                        aria-controls="simple-menu"
+                        aria-haspopup="true"
+                        onClick={(event) => {
+                          event.stopPropagation(); // Prevent modal opening
+                          handleMenuClick(event, asset);
+                        }}
+                      >
+                        <MoreVertIcon sx={{ color: colors.grey[100] }} />
+                      </IconButton>
+                    )}
+                  </Box>
                 </Box>
               </Grid>
             ))}
@@ -180,24 +228,36 @@ const Profile = () => {
         )}
       </Box>
 
-      {/* Modal for Asset Details */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem
+          onClick={() => handleStatusChange("Accepted")}
+          disabled={currentAsset?.Status !== "Issued"}
+        >
+          Accept
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleStatusChange("Rejected")}
+          disabled={currentAsset?.Status !== "Issued"}
+        >
+          Reject
+        </MenuItem>
+      </Menu>
+
+      {/* Modal for asset details */}
+      <Modal open={isModalOpen} onClose={handleCloseModal}>
         <Box
+          m="auto"
+          mt="100px"
           p="20px"
-          m="20px auto"
-          maxWidth="600px"
           backgroundColor={colors.primary[400]}
           borderRadius="8px"
-          style={{
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            position: "absolute",
-          }}
+          maxWidth="600px"
         >
-          {detailsLoading ? (
-            <CircularProgress />
-          ) : assetDetails ? (
+          {assetDetails ? (
             <>
               <Typography variant="h6">Asset Details</Typography>
               <Typography>Asset ID: {assetDetails.AssetId}</Typography>
@@ -213,7 +273,7 @@ const Profile = () => {
               <Typography>Status: {assetDetails.Status}</Typography>
             </>
           ) : (
-            <Typography>Failed to load asset details.</Typography>
+            <Typography>Loading asset details...</Typography>
           )}
         </Box>
       </Modal>
