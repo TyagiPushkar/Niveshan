@@ -7,12 +7,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Link, useParams } from "react-router-dom";
@@ -25,17 +19,14 @@ const EmployeeDetails = () => {
   const colors = tokens(theme.palette.mode);
   const [employeeData, setEmployeeData] = useState(null);
   const [assetsData, setAssetsData] = useState([]);
-  const [assetDetail, setAssetDetail] = useState(null);
+  const [assetDetail, setAssetDetail] = useState(null); // State to store asset detail
   const [loading, setLoading] = useState(true);
   const [assetsLoading, setAssetsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedAssetId, setSelectedAssetId] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
-    Remark: "",
-  });
 
+  // Fetch employee data by EmpId
   useEffect(() => {
     const fetchEmployeeData = async () => {
       try {
@@ -54,7 +45,6 @@ const EmployeeDetails = () => {
     fetchEmployeeData();
     fetchAssetsData();
   }, [EmpId]);
-
   const fetchAssetsData = async () => {
     try {
       const response = await fetch(
@@ -72,83 +62,107 @@ const EmployeeDetails = () => {
       setAssetsLoading(false);
     }
   };
-
+  // Fetch asset detail by assetId
   const fetchAssetDetail = async (assetId) => {
     try {
       const response = await fetch(
         `https://namami-infotech.com/NiveshanBackend/api/assets/get_assets.php?AssetId=${assetId}`
       );
       const data = await response.json();
-      setAssetDetail(data.data[0]);
+      setAssetDetail(data.data[0]); // Assuming asset detail is under "data"
     } catch (error) {
       console.error("Error fetching asset detail:", error);
     }
   };
 
+  // Function to open menu for asset
   const handleMenuOpen = (event, assetId) => {
     setAnchorEl(event.currentTarget);
     setSelectedAssetId(assetId);
-    fetchAssetDetail(assetId);
+    fetchAssetDetail(assetId); // Fetch asset detail when menu opens
   };
 
+  // Function to close menu
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedAssetId(null);
   };
 
-  const handleEditDialogOpen = () => {
-    setEditForm({
-      Remark: assetDetail?.Remark || "",
-    });
-    setEditDialogOpen(true);
-  };
+  const updateStatusToInStockAndReturned = async () => {
+    setUpdateLoading(true);
 
-  const handleEditDialogClose = () => {
-    setEditDialogOpen(false);
-  };
-
-  const handleEditFormChange = (e) => {
-    const { name, value } = e.target;
-    setEditForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleEditSubmit = async () => {
-    try {
-      const response = await fetch(
-        "https://namami-infotech.com/NiveshanBackend/api/assets/update_remark.php",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            AssetID: selectedAssetId,
-            Remark: editForm.Remark,
-          }),
-        }
-      );
-      const data = await response.json();
-        
-
-      if (data.success) {
-        setAssetsData((prevAssets) =>
-          prevAssets.map((asset) =>
-            asset.AssetID === selectedAssetId
-              ? { ...asset, Remark: editForm.Remark }
-              : asset
-          )
+    // First API call: Update the asset's main status to "In stock"
+    const updateInStockStatus = async () => {
+      try {
+        const inStockResponse = await fetch(
+          "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              AssetID: selectedAssetId,
+              Status: "In stock",
+            }),
+          }
         );
+        const inStockData = await inStockResponse.json();
+        if (inStockData.message) {
+          // alert(inStockData.message);
+        }
+      } catch (error) {
+        console.error("Error updating to In stock:", error);
+        // alert("Failed to update asset main status to In stock.");
       }
-      setEditDialogOpen(false);
-      handleMenuClose();
-    } catch (error) {
-      console.error("Error updating remark:", error);
-    }
+    };
+
+    // Second API call: Update the asset's issue status to "Returned"
+    const updateIssueStatusToReturned = async () => {
+      try {
+        const returnedResponse = await fetch(
+          "https://namami-infotech.com/NiveshanBackend/api/assets/update_issue_status.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              AssetID: selectedAssetId,
+              Status: "Returned",
+            }),
+          }
+        );
+        const returnedData = await returnedResponse.json();
+        if (returnedData.message) {
+          // alert(returnedData.message);
+        }
+        fetchAssetsData();
+        // Update local state only for "Returned" status
+        if (returnedData.success) {
+          setAssetsData((prevAssets) =>
+            prevAssets.map((asset) =>
+              asset.AssetID === selectedAssetId
+                ? { ...asset, Status: "Returned" }
+                : asset
+            )
+          );
+        } else {
+          // alert("Failed to update issue status to Returned.");
+        }
+      } catch (error) {
+        console.error("Error updating to Returned:", error);
+        // alert("Failed to update issue status to Returned.");
+      }
+    };
+
+    // Execute both updates independently
+    await Promise.all([updateInStockStatus(), updateIssueStatusToReturned()]);
+
+    setUpdateLoading(false);
+    handleMenuClose();
   };
-  
+
   if (loading) {
     return <Typography>Loading employee data...</Typography>;
   }
@@ -180,10 +194,6 @@ const EmployeeDetails = () => {
         </Typography>
         <Typography variant="h6">
           Designation: <b style={{ color: "green" }}> {employeeData.Role}</b>
-        </Typography>
-        <Typography variant="h6">
-          Department:{" "}
-          <b style={{ color: "green" }}> {employeeData.Functions}</b>
         </Typography>
         <Typography variant="h6">
           Status: <b style={{ color: "green" }}> {employeeData.Status}</b>
@@ -258,8 +268,11 @@ const EmployeeDetails = () => {
                       )}
                       onClose={handleMenuClose}
                     >
-                      <MenuItem onClick={handleEditDialogOpen}>
-                        Edit Remark
+                      <MenuItem
+                        onClick={updateStatusToInStockAndReturned}
+                        disabled={updateLoading}
+                      >
+                        Return Asset
                       </MenuItem>
                     </Menu>
                   </Box>
@@ -271,29 +284,6 @@ const EmployeeDetails = () => {
           <Typography>No assets issued to this employee.</Typography>
         )}
       </Box>
-
-      {/* Edit Remark Dialog */}
-      <Dialog open={editDialogOpen} onClose={handleEditDialogClose}>
-        <DialogTitle>Edit Remark</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="Remark"
-            label="Remark"
-            type="text"
-            fullWidth
-            value={editForm.Remark}
-            onChange={handleEditFormChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditDialogClose}>Cancel</Button>
-          <Button onClick={handleEditSubmit} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };
