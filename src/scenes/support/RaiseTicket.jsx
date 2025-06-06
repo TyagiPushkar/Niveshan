@@ -13,11 +13,14 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // Import Quill styles
 
 const RaiseTicket = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  const navigate = useNavigate();
   // Fetch user details from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const EmpId = userDetails ? userDetails.EmpId : ""; // Fallback to empty if not found
@@ -63,10 +66,13 @@ const RaiseTicket = () => {
     formDataToSend.append("Status", formData.Status);
 
     try {
-      const response = await fetch("https://namami-infotech.com/NiveshanBackend/api/support/raise_ticket.php", {
-        method: "POST",
-        body: formDataToSend,
-      });
+      const response = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/support/raise_ticket.php",
+        {
+          method: "POST",
+          body: formDataToSend,
+        }
+      );
 
       const data = await response.json();
 
@@ -88,17 +94,28 @@ const RaiseTicket = () => {
       setSuccess(null);
     } finally {
       setLoading(false); // Reset loading state
+      navigate("/support-ticket");
     }
   };
 
   return (
     <Box m="20px">
-      <Header title="Raise Support Ticket" subtitle="Create a new support ticket" />
+      <Header
+        title="Raise Support Ticket"
+        subtitle="Create a new support ticket"
+      />
 
       <form onSubmit={handleSubmit}>
-        <Box display="grid" gridTemplateColumns="auto auto" gap="20px" width="80%">
+        <Box
+          display="grid"
+          gridTemplateColumns="auto auto"
+          gap="20px"
+          width="80%"
+        >
           <FormControl fullWidth required>
-            <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>
+            <InputLabel
+              sx={{ color: "white", "&.Mui-focused": { color: "white" } }}
+            >
               Category
             </InputLabel>
             <Select
@@ -107,61 +124,73 @@ const RaiseTicket = () => {
               value={formData.Category}
               onChange={handleChange}
               sx={{
-                color: 'white', 
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white' },
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.greenAccent[500] },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: colors.greenAccent[600] },
+                color: "white",
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.greenAccent[500],
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.greenAccent[600],
+                },
               }}
             >
               <MenuItem value="Hardware">Hardware</MenuItem>
               <MenuItem value="Software">Software</MenuItem>
-              {/* Add more categories as needed */}
+              <MenuItem value="ERP365">ERP365</MenuItem>
             </Select>
           </FormControl>
 
-          <TextField
-            fullWidth
-            variant="outlined"
-            label="Problem Description"
-            name="Remark"
-            value={formData.Remark}
-            onChange={handleChange}
-            required
-            multiline
-            rows={4}
-            sx={{
-              gridColumn: "span 2",
-              '& .MuiInputLabel-root': {
-                color: 'white',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: 'white',
-              },
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': {
-                  borderColor: 'white',
+          <Box sx={{ gridColumn: "span 2" }}>
+            <Typography sx={{ color: "white", mb: "5px" }}>
+              Problem Description
+            </Typography>
+            <ReactQuill
+              theme="snow"
+              value={formData.Remark}
+              onChange={(value) => setFormData({ ...formData, Remark: value })}
+              required
+              multiline
+              style={{ height: "200px" }}
+              sx={{
+                gridColumn: "span 2",
+                "& .MuiInputLabel-root": {
+                  color: "white",
                 },
-                '&:hover fieldset': {
-                  borderColor: colors.greenAccent[500],
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "white",
                 },
-                '&.Mui-focused fieldset': {
-                  borderColor: colors.greenAccent[600],
+                "& .MuiOutlinedInput-root": {
+                  color: "white",
+                  "& fieldset": {
+                    borderColor: "white",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: colors.greenAccent[500],
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: colors.greenAccent[600],
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          </Box>
 
           <Box>
-            <InputLabel sx={{ color: 'white' }}>Upload Image (optional)</InputLabel>
+            <InputLabel sx={{ color: "white", mt: "50px" }}>
+              Upload Image (optional)
+            </InputLabel>
             <input
               type="file"
               name="Image"
               onChange={handleImageChange}
               accept="image/*"
-              style={{ color: 'white' }}
+              style={{ color: "white" }}
             />
-            {formData.Image && <Typography variant="body2" sx={{ color: 'white' }}>{formData.Image.name}</Typography>}
+            {formData.Image && (
+              <Typography variant="body2" sx={{ color: "white" }}>
+                {formData.Image.name}
+              </Typography>
+            )}
           </Box>
         </Box>
 
@@ -192,7 +221,11 @@ const RaiseTicket = () => {
           }}
           disabled={loading} // Disable button while loading
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Ticket"}
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Submit Ticket"
+          )}
         </Button>
       </form>
     </Box>

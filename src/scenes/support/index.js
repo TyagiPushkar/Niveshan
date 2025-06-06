@@ -16,36 +16,62 @@ const Support = () => {
   const colors = tokens(theme.palette.mode);
   const [ticketData, setTicketData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [resolvedByMap, setResolvedByMap] = useState({});
+
 const location = useLocation(); // Get current location
   const queryParams = new URLSearchParams(location.search);
   const statusFilter = queryParams.get("status"); // Extract 'status' query parameter
 
   const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+  const isErpAdmin = userDetails?.Role === 'ERPADMIN';
+  const isL2 = userDetails?.Role === 'L2';
   const isAdmin = userDetails?.Role === 'Admin';
   const empId = userDetails?.EmpId;
 
  useEffect(() => {
-    const fetchTicketData = async () => {
-      try {
-        let url = "https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php";
-        if (!isAdmin) {
-          url += `?EmpId=${empId}`;
-        }
-        const response = await fetch(url);
-        const data = await response.json();
-
-        // Filter tickets if statusFilter is applied
-        const filteredData = statusFilter
-          ? data.filter((ticket) => ticket.Status === statusFilter)
-          : data;
-
-        setTicketData(filteredData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching ticket data:", error);
-        setLoading(false);
+  const fetchTicketData = async () => {
+    try {
+      let url = "https://namami-infotech.com/NiveshanBackend/api/support/get_ticket.php";
+      if (isErpAdmin) {
+        url += `?Role=ERPADMIN`;
+      } else if (isL2) {
+        url += `?Role=L2`;
+      } else if (!isAdmin) {
+        url += `?EmpId=${empId}`;
       }
-    };
+  
+      const response = await fetch(url);
+      const data = await response.json();
+  
+      const filteredData = statusFilter
+        ? data.filter((ticket) => ticket.Status === statusFilter)
+        : data;
+  
+      setTicketData(filteredData);
+  
+      // Fetch last resolver for Reopen tickets
+      const reopenTickets = filteredData.filter(t => t.Status === "Reopen");
+      const resolverMap = {};
+  
+      await Promise.all(
+        reopenTickets.map(async (ticket) => {
+          const updateRes = await fetch(`https://namami-infotech.com/NiveshanBackend/api/support/get_updates.php?ticketId=${ticket.id}`);
+          const updates = await updateRes.json();
+          const lastResolved = updates.reverse().find(u => u.Status === "Resolved"); // Adjust status if needed
+          if (lastResolved) {
+            resolverMap[ticket.id] = lastResolved.UpdateBy;
+          }
+        })
+      );
+  
+      setResolvedByMap(resolverMap);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching ticket data:", error);
+      setLoading(false);
+    }
+  };
+  
 
     fetchTicketData();
   }, [isAdmin, empId, statusFilter]);
