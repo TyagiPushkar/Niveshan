@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+"use client";
+
+import { useState } from "react";
 import {
   Box,
   Button,
-  TextField,
   Typography,
   useTheme,
   MenuItem,
@@ -31,7 +32,7 @@ const RaiseTicket = () => {
   const [formData, setFormData] = useState({
     Category: "",
     Remark: "",
-    Image: null,
+    Image: null, // Keep as Image to match the form field name expected by PHP
     Status: "Open", // Default to "Open"
   });
 
@@ -45,8 +46,8 @@ const RaiseTicket = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle image file upload
-  const handleImageChange = (e) => {
+  // Handle file upload
+  const handleFileChange = (e) => {
     const file = e.target.files[0]; // Get the first file
     setFormData({ ...formData, Image: file });
   };
@@ -61,7 +62,7 @@ const RaiseTicket = () => {
     formDataToSend.append("Category", formData.Category);
     formDataToSend.append("Remark", formData.Remark);
     if (formData.Image) {
-      formDataToSend.append("Image", formData.Image);
+      formDataToSend.append("Image", formData.Image); // Keep as Image to match PHP expectation
     }
     formDataToSend.append("Status", formData.Status);
 
@@ -177,13 +178,13 @@ const RaiseTicket = () => {
 
           <Box>
             <InputLabel sx={{ color: "white", mt: "50px" }}>
-              Upload Image (optional)
+              Upload File (optional)
             </InputLabel>
             <input
               type="file"
               name="Image"
-              onChange={handleImageChange}
-              accept="image/*"
+              onChange={handleFileChange}
+              // Removed accept="image/*" to allow all file types
               style={{ color: "white" }}
             />
             {formData.Image && (
