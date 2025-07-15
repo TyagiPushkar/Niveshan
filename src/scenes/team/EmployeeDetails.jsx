@@ -91,76 +91,50 @@ const EmployeeDetails = () => {
   const updateStatusToInStockAndReturned = async () => {
     setUpdateLoading(true);
 
-    // First API call: Update the asset's main status to "In stock"
-    const updateInStockStatus = async () => {
-      try {
-        const inStockResponse = await fetch(
-          "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              AssetID: selectedAssetId,
-              Status: "In stock",
-            }),
-          }
-        );
-        const inStockData = await inStockResponse.json();
-        if (inStockData.message) {
-          // alert(inStockData.message);
+    try {
+      // First API call: Update the asset's main status to "In stock"
+      await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            AssetID: selectedAssetId,
+            Status: "In stock",
+          }),
         }
-      } catch (error) {
-        console.error("Error updating to In stock:", error);
-        // alert("Failed to update asset main status to In stock.");
+      );
+
+      // Second API call: Update the asset's issue status to "Returned"
+      const returnedResponse = await fetch(
+        "https://namami-infotech.com/NiveshanBackend/api/assets/update_issue_status.php",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            AssetID: selectedAssetId,
+            Status: "Returned",
+            EmpId: EmpId, // Make sure to include EmpId
+          }),
+        }
+      );
+
+      const returnedData = await returnedResponse.json();
+
+      if (returnedData.message) {
+        // Refresh the assets data
+        await fetchAssetsData();
       }
-    };
-
-    // Second API call: Update the asset's issue status to "Returned"
-    const updateIssueStatusToReturned = async () => {
-      try {
-        const returnedResponse = await fetch(
-          "https://namami-infotech.com/NiveshanBackend/api/assets/update_issue_status.php",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              AssetID: selectedAssetId,
-              Status: "Returned",
-            }),
-          }
-        );
-        const returnedData = await returnedResponse.json();
-        if (returnedData.message) {
-          // alert(returnedData.message);
-        }
-        fetchAssetsData();
-        // Update local state only for "Returned" status
-        if (returnedData.success) {
-          setAssetsData((prevAssets) =>
-            prevAssets.map((asset) =>
-              asset.AssetID === selectedAssetId
-                ? { ...asset, Status: "Returned" }
-                : asset
-            )
-          );
-        } else {
-          // alert("Failed to update issue status to Returned.");
-        }
-      } catch (error) {
-        console.error("Error updating to Returned:", error);
-        // alert("Failed to update issue status to Returned.");
-      }
-    };
-
-    // Execute both updates independently
-    await Promise.all([updateInStockStatus(), updateIssueStatusToReturned()]);
-
-    setUpdateLoading(false);
-    handleMenuClose();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setUpdateLoading(false);
+      handleMenuClose();
+    }
   };
 
   if (loading) {

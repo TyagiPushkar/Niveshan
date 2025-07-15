@@ -106,7 +106,7 @@ const Profile = () => {
   };
 
   const handleStatusChange = async (newStatus) => {
-    if (!currentAsset) return;
+    if (!currentAsset || !EmpId) return;
 
     try {
       const response = await fetch(
@@ -119,9 +119,11 @@ const Profile = () => {
           body: JSON.stringify({
             AssetID: currentAsset.AssetID,
             Status: newStatus,
+            EmpId: EmpId, // Include EmpId in the request
           }),
         }
       );
+
       const data = await response.json();
       if (data.message) {
         console.log("Status updated:", data.message);
@@ -132,6 +134,23 @@ const Profile = () => {
         );
         setAssetsData(updatedAssets);
         handleMenuClose();
+
+        // If status is Accepted, also update the AssetMaster status
+        if (newStatus === "Accepted") {
+          await fetch(
+            "https://namami-infotech.com/NiveshanBackend/api/assets/update_status.php",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                AssetID: currentAsset.AssetID,
+                Status: "Issued", // Or whatever status you want to set in AssetMaster
+              }),
+            }
+          );
+        }
       } else {
         console.error("Error updating status:", data.message);
       }
