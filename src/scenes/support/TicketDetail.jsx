@@ -13,6 +13,7 @@ import {
   CardContent,
   Divider,
   CircularProgress,
+  TextField,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
@@ -70,7 +71,11 @@ const TicketDetail = () => {
   const [remark, setRemark] = useState("");
   const [forwardImage, setForwardImage] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-
+  const [effort, setEffort] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+  });
   // Get user details from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
@@ -192,10 +197,20 @@ const TicketDetail = () => {
       return;
     }
 
+    if (
+      selectedStatus === "Resolved" &&
+      effort.days === 0 &&
+      effort.hours === 0 &&
+      effort.minutes === 0
+    ) {
+      alert("Please enter the effort taken to resolve this ticket.");
+      return;
+    }
     setIsUpdating(true);
 
     try {
       let response;
+      const effortString = `${effort.days}d ${effort.hours}h ${effort.minutes}m`;
 
       if (selectedStatus === "Forward to L2") {
         const formData = new FormData();
@@ -227,6 +242,7 @@ const TicketDetail = () => {
               Status: selectedStatus,
               Update_remark: remark,
               UpdateBy: userDetails.EmpId,
+              Effort: selectedStatus === "Resolved" ? effortString : null,
             }),
           }
         );
@@ -456,6 +472,11 @@ const TicketDetail = () => {
                           >
                             {log.Status}
                           </Typography>
+                          {log.Status == "Resolved" && (
+                            <Typography variant="caption">
+                              {`Effort - ${log.Effort}`}
+                            </Typography>
+                          )}
                           <Typography
                             variant="caption"
                             color={COLORS.grey[300]}
@@ -601,7 +622,74 @@ const TicketDetail = () => {
                     ))}
                   </Select>
                 </FormControl>
-
+                {selectedStatus === "Resolved" && (
+                  <Box mt="20px">
+                    <Typography variant="h6" gutterBottom>
+                      Effort to Resolve
+                    </Typography>
+                    <Box display="flex" gap="10px" alignItems="center">
+                      <TextField
+                        label="Days"
+                        type="number"
+                        value={effort.days}
+                        onChange={(e) => {
+                          const value = Math.min(
+                            10,
+                            Math.max(0, parseInt(e.target.value) || 0)
+                          );
+                          setEffort({ ...effort, days: value });
+                        }}
+                        inputProps={{
+                          min: 0,
+                          max: 10,
+                        }}
+                        sx={{ width: "80px" }}
+                        error={effort.days > 10}
+                        helperText={effort.days > 10 ? "Max 10 days" : ""}
+                      />
+                      <Typography>:</Typography>
+                      <TextField
+                        label="Hours"
+                        type="number"
+                        value={effort.hours}
+                        onChange={(e) => {
+                          const value = Math.min(
+                            23,
+                            Math.max(0, parseInt(e.target.value) || 0)
+                          );
+                          setEffort({ ...effort, hours: value });
+                        }}
+                        inputProps={{
+                          min: 0,
+                          max: 23,
+                        }}
+                        sx={{ width: "80px" }}
+                        error={effort.hours > 23}
+                        helperText={effort.hours > 23 ? "Max 23 hours" : ""}
+                      />
+                      <Typography>:</Typography>
+                      <TextField
+                        label="Minutes"
+                        type="number"
+                        value={effort.minutes}
+                        onChange={(e) => {
+                          const value = Math.min(
+                            59,
+                            Math.max(0, parseInt(e.target.value) || 0)
+                          );
+                          setEffort({ ...effort, minutes: value });
+                        }}
+                        inputProps={{
+                          min: 0,
+                          max: 59,
+                        }}
+                        sx={{ width: "80px" }}
+                        error={effort.minutes > 59}
+                        helperText={effort.minutes > 59 ? "Max 59 minutes" : ""}
+                      />
+                    </Box>
+                  </Box>
+                )}
                 {selectedStatus === "Forward to L2" && (
                   <Button
                     variant="outlined"
