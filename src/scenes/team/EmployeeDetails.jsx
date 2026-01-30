@@ -172,6 +172,12 @@ const EmployeeDetails = () => {
         <Typography variant="h6">
           Status: <b style={{ color: "green" }}> {employeeData.Status}</b>
         </Typography>
+         <Typography variant="h6">
+          RM Name: <b style={{ color: "green" }}> {employeeData.RM_Name}</b>
+        </Typography>
+         <Typography variant="h6">
+          RM Mail: <b style={{ color: "green" }}> {employeeData.RM_Mail}</b>
+        </Typography>
         <Typography variant="h6">
           Date of Joining:{" "}
           <b style={{ color: "green" }}>{employeeData.DateOfJoining}</b>

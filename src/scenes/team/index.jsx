@@ -158,6 +158,8 @@ const Team = () => {
     { field: "Mobile", headerName: "Mobile", flex: 1 },
     { field: "Email", headerName: "Email", flex: 1 },
     { field: "Role", headerName: "Designation", flex: 1 },
+    { field: "RM_Name", headerName: "RM Name", flex: 1 },
+    { field: "RM_Mail", headerName: "RM Mail", flex: 1 },
     { field: "Status", headerName: "Status", flex: 1 },
     { field: "DateOfJoining", headerName: "Date of Joining", flex: 1 },
     {
@@ -176,7 +178,7 @@ const Team = () => {
             onChange={() =>
               handleToggleUserStatus(
                 params.row.EmpId,
-                params.row.Status === "Active"
+                params.row.Status === "Active",
               )
             }
             style={{ color: "#3DA58A" }}
