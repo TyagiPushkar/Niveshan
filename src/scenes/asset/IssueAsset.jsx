@@ -20,13 +20,16 @@ const IssueAsset = () => {
   const [assets, setAssets] = useState([]);
   const [assetType, setAssetType] = useState("");
   const [filteredAssets, setFilteredAssets] = useState([]);
-  const [formData, setFormData] = useState({
-    EmpId: "",
-    AssetID: "",
-    Status: "Issued",
-    Remark: "",
-    IssueDate: new Date().toISOString().split('T')[0],
-  });
+ const [formData, setFormData] = useState({
+   EmpId: "",
+   AssetID: "",
+   Status: "Issued",
+   Remark: "",
+   IssueDate: new Date().toISOString().split("T")[0],
+   IssueType: "Permanent", // NEW
+   ExpectedReturnDate: null, // NEW
+ });
+
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -107,8 +110,11 @@ const IssueAsset = () => {
         AssetID: "",
         Status: "Issued",
         Remark: "",
-        IssueDate: new Date().toISOString().split('T')[0],
+        IssueDate: new Date().toISOString().split("T")[0],
+        IssueType: "Permanent",
+        ExpectedReturnDate: null,
       });
+
       setAssetType("");
       setFilteredAssets([]);
     } catch (error) {
@@ -130,41 +136,65 @@ const IssueAsset = () => {
         <Box
           component="form"
           onSubmit={handleSubmit}
-          sx={{ display: "grid", gap: "20px", gridTemplateColumns: "auto auto" }}
+          sx={{
+            display: "grid",
+            gap: "20px",
+            gridTemplateColumns: "auto auto",
+          }}
         >
           <Autocomplete
             options={employees}
             getOptionLabel={(option) => `${option.Name} (${option.EmpId})`}
-            onChange={(event, newValue) => handleChange("EmpId", newValue ? newValue.EmpId : "")}
+            onChange={(event, newValue) =>
+              handleChange("EmpId", newValue ? newValue.EmpId : "")
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Employee"
                 required
-               sx={{
-              
-              '& .MuiInputLabel-root': {
-                color: 'white',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: 'white',
-              },
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': {
-                  borderColor: 'white',
-                },
-                '&:hover fieldset': {
-                  borderColor: colors.greenAccent[500],
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: colors.greenAccent[600],
-                },
-              },
-            }}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    color: "white",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "white",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    color: "white",
+                    "& fieldset": {
+                      borderColor: "white",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[600],
+                    },
+                  },
+                }}
               />
             )}
           />
+          <FormControl sx={{ width: "400px" }}>
+            <InputLabel>Issue Type</InputLabel>
+            <Select
+              value={formData.IssueType}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleChange("IssueType", value);
+
+                // Clear ExpectedReturnDate if Permanent
+                if (value === "Permanent") {
+                  handleChange("ExpectedReturnDate", null);
+                }
+              }}
+              required
+            >
+              <MenuItem value="Permanent">Permanent</MenuItem>
+              <MenuItem value="Temporary">Temporary</MenuItem>
+            </Select>
+          </FormControl>
 
           <FormControl sx={{ width: "400px" }}>
             <InputLabel>Asset Type</InputLabel>
@@ -174,7 +204,10 @@ const IssueAsset = () => {
               required
               sx={{
                 ".MuiOutlinedInput-notchedOutline": {
-                  borderColor: theme.palette.mode === "dark" ? colors.grey[500] : "inherit",
+                  borderColor:
+                    theme.palette.mode === "dark"
+                      ? colors.grey[500]
+                      : "inherit",
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                   borderColor: colors.greenAccent[500],
@@ -188,37 +221,63 @@ const IssueAsset = () => {
 
           <Autocomplete
             options={filteredAssets}
-            getOptionLabel={(option) => `${option.AssetName} (${option.AssetId})`}
-            onChange={(event, newValue) => handleChange("AssetID", newValue ? newValue.AssetId : "")}
+            getOptionLabel={(option) =>
+              `${option.AssetName} (${option.AssetId})`
+            }
+            onChange={(event, newValue) =>
+              handleChange("AssetID", newValue ? newValue.AssetId : "")
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Asset"
                 required
-               sx={{
-              
-              '& .MuiInputLabel-root': {
-                color: 'white',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: 'white',
-              },
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': {
-                  borderColor: 'white',
-                },
-                '&:hover fieldset': {
-                  borderColor: colors.greenAccent[500],
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: colors.greenAccent[600],
-                },
-              },
-            }}
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    color: "white",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "white",
+                  },
+                  "& .MuiOutlinedInput-root": {
+                    color: "white",
+                    "& fieldset": {
+                      borderColor: "white",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: colors.greenAccent[500],
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: colors.greenAccent[600],
+                    },
+                  },
+                }}
               />
             )}
           />
+          {formData.IssueType === "Temporary" && (
+            <TextField
+              label="Expected Return Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formData.ExpectedReturnDate || ""}
+              onChange={(e) =>
+                handleChange("ExpectedReturnDate", e.target.value)
+              }
+              required
+              sx={{
+                "& .MuiInputLabel-root": { color: "white" },
+                "& .MuiOutlinedInput-root": {
+                  color: "white",
+                  "& fieldset": { borderColor: "white" },
+                  "&:hover fieldset": { borderColor: colors.greenAccent[500] },
+                  "&.Mui-focused fieldset": {
+                    borderColor: colors.greenAccent[600],
+                  },
+                },
+              }}
+            />
+          )}
 
           <TextField
             label="Remark"
@@ -228,23 +287,22 @@ const IssueAsset = () => {
             required
             multiline
             rows={3}
-           sx={{
-              
-              '& .MuiInputLabel-root': {
-                color: 'white',
+            sx={{
+              "& .MuiInputLabel-root": {
+                color: "white",
               },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: 'white',
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "white",
               },
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': {
-                  borderColor: 'white',
+              "& .MuiOutlinedInput-root": {
+                color: "white",
+                "& fieldset": {
+                  borderColor: "white",
                 },
-                '&:hover fieldset': {
+                "&:hover fieldset": {
                   borderColor: colors.greenAccent[500],
                 },
-                '&.Mui-focused fieldset': {
+                "&.Mui-focused fieldset": {
                   borderColor: colors.greenAccent[600],
                 },
               },
@@ -255,8 +313,7 @@ const IssueAsset = () => {
             type="submit"
             variant="contained"
             color="primary"
-              disabled={submitLoading}
-              
+            disabled={submitLoading}
           >
             {submitLoading ? "Issuing..." : "Issue Asset"}
           </Button>

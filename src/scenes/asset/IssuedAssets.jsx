@@ -39,6 +39,12 @@ const IssuedAssets = () => {
     { field: "AssetID", headerName: "Asset ID", width: 150 },
     { field: "AssetName", headerName: "Asset Name", width: 200 }, // Added column for Asset Name
     { field: "AssetType", headerName: "Asset Type", width: 150 }, // Added column for Asset Type
+    { field: "IssueType", headerName: "Issue Type", width: 150 },
+    {
+      field: "ExpectedReturnDate",
+      headerName: "Expected Return Date",
+      width: 150,
+    },
     {
       field: "Status",
       headerName: "Status",
