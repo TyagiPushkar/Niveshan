@@ -86,9 +86,9 @@ const IssuedAssets = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box m="0 0 0 20px" height="calc(100vh - 75px)" display="flex" flexDirection="column">
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb="10px">
         <Header title="ISSUED ASSETS" subtitle="List of Issued Assets" />
         
         <Box display="flex" justifyContent="space-between" gap="10px">
@@ -127,8 +127,8 @@ const IssuedAssets = () => {
 
       {/* Data Grid */}
       <Box
-        m="10px 0 0 0"
-        height="75vh"
+        flexGrow={1}
+        minHeight={0}
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",

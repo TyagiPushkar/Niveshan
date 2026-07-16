@@ -1,5 +1,5 @@
-import { Box, IconButton, useTheme, Menu, MenuItem, Modal, TextField, Button } from "@mui/material";
-import { useContext, useState } from "react";
+import { Box, IconButton, useTheme, Menu, MenuItem, Modal, TextField, Button, Typography, Divider } from "@mui/material";
+import { useContext, useState, useEffect } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -18,6 +18,25 @@ const Topbar = () => {
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
   const EmpId = userDetails.EmpId; // Get EmpId from localStorage
+  const { Name, Role } = userDetails;
+
+  const [employeeData, setEmployeeData] = useState(null);
+
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      if (!EmpId) return;
+      try {
+        const response = await fetch(
+          `https://namami-infotech.com/NiveshanBackend/api/users/get_users.php?EmpId=${EmpId}`
+        );
+        const data = await response.json();
+        setEmployeeData(data);
+      } catch (error) {
+        console.error("Error fetching employee data in Topbar:", error);
+      }
+    };
+    fetchEmployeeData();
+  }, [EmpId]);
 
   // Function to handle menu opening
   const handleMenuClick = (event) => {
@@ -35,9 +54,6 @@ const Topbar = () => {
     navigate("/login"); // Redirect to login
   };
 
-  const handleProfile = () => {
-    navigate("/"); // Redirect to profile page
-  };
 
   const handleChangePassword = () => {
     // Ensure passwords match
@@ -76,7 +92,17 @@ const Topbar = () => {
   };
 
   return (
-    <Box display="flex" justifyContent="space-between" p={2}>
+    <Box 
+      display="flex" 
+      justifyContent="space-between" 
+      p="10px 20px" 
+      backgroundColor={colors.primary[400]}
+      boxShadow="0px 4px 8px rgba(0, 0, 0, 0.15)"
+      position="relative"
+      zIndex={10}
+      borderRadius="0px"
+      mb="15px"
+    >
       <Box display="flex" backgroundColor={colors.primary[400]} borderRadius="3px">
         {/* <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
         <IconButton type="button" sx={{ p: 1 }}>
@@ -103,14 +129,110 @@ const Topbar = () => {
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
+          PaperProps={{
+            sx: {
+              width: "300px",
+              padding: "15px",
+              backgroundColor: colors.primary[400],
+              backgroundImage: "none",
+              boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
+              borderRadius: "8px",
+            }
+          }}
         >
-          <MenuItem onClick={handleProfile}>Profile</MenuItem>
-          <MenuItem onClick={() => setOpenModal(true)}>Change Password</MenuItem>
-          {/* <MenuItem onClick={handleLogout}>Logout</MenuItem> */}
+          <Box display="flex" flexDirection="column" alignItems="center" mb="15px">
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              width="60px"
+              height="60px"
+              borderRadius="50%"
+              bgcolor={colors.blueAccent[500]}
+              color={colors.grey[100]}
+              mb="10px"
+            >
+              <PersonOutlinedIcon style={{ fontSize: "35px" }} />
+            </Box>
+            <Typography variant="h5" fontWeight="bold" color={colors.grey[100]} textAlign="center">
+              {employeeData?.Name || Name || "User"}
+            </Typography>
+            <Typography variant="subtitle2" color={colors.greenAccent[500]}>
+              {employeeData?.Role || Role || "Role"}
+            </Typography>
+          </Box>
+
+          <Divider sx={{ my: "10px", borderColor: colors.grey[700] }} />
+
+          <Box display="flex" flexDirection="column" gap="10px" py="5px">
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2" color={colors.grey[300]}>Emp ID:</Typography>
+              <Typography variant="body2" fontWeight="bold" color={colors.grey[100]}>{EmpId || "N/A"}</Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2" color={colors.grey[300]}>Email:</Typography>
+              <Typography variant="body2" fontWeight="bold" color={colors.grey[100]} sx={{ wordBreak: "break-all" }}>
+                {employeeData?.Email || "N/A"}
+              </Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2" color={colors.grey[300]}>Mobile:</Typography>
+              <Typography variant="body2" fontWeight="bold" color={colors.grey[100]}>{employeeData?.Mobile || "N/A"}</Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2" color={colors.grey[300]}>Joining Date:</Typography>
+              <Typography variant="body2" fontWeight="bold" color={colors.grey[100]}>
+                {employeeData?.DateOfJoining || "N/A"}
+              </Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2" color={colors.grey[300]}>Status:</Typography>
+              <Typography variant="body2" fontWeight="bold" color={colors.grey[100]}>{employeeData?.Status || "N/A"}</Typography>
+            </Box>
+          </Box>
+
+          <Divider sx={{ my: "10px", borderColor: colors.grey[700] }} />
+
+          <Box display="flex" flexDirection="column" gap="8px" mt="5px">
+            <MenuItem 
+              onClick={() => {
+                setOpenModal(true);
+                handleMenuClose();
+              }}
+              sx={{ 
+                borderRadius: "4px",
+                justifyContent: "center",
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                "&:hover": {
+                  backgroundColor: colors.blueAccent[600]
+                }
+              }}
+            >
+              Change Password
+            </MenuItem>
+            <MenuItem 
+              onClick={() => {
+                handleLogout();
+                handleMenuClose();
+              }}
+              sx={{ 
+                borderRadius: "4px",
+                justifyContent: "center",
+                backgroundColor: colors.redAccent[600],
+                color: "white",
+                "&:hover": {
+                  backgroundColor: colors.redAccent[500]
+                }
+              }}
+            >
+              Logout
+            </MenuItem>
+          </Box>
         </Menu>
-        <IconButton onClick={handleLogout}>
+        {/* <IconButton onClick={handleLogout}>
           <LogoutIcon />
-        </IconButton>
+        </IconButton> */}
       </Box>
 
       {/* Modal for Change Password */}

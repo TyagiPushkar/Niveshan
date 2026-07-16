@@ -85,36 +85,49 @@ const Report = () => {
   ];
 
   return (
-    <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Box m="0 0 0 20px" height="calc(100vh - 75px)" display="flex" flexDirection="column">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb="10px">
         <Header title="Asset Issues Report" subtitle="Download Asset Issues Report" />
         
         {/* Date Filters */}
-        <Box display="flex" gap="10px">
+        <Box display="flex" gap="10px" alignItems="center">
           <TextField
             label="From Date"
             type="date"
+            size="small"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
+            InputProps={{
+              style: {
+                height: "40px",
+              }
+            }}
           />
           <TextField
             label="To Date"
             type="date"
+            size="small"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
+            InputProps={{
+              style: {
+                height: "40px",
+              }
+            }}
           />
         </Box>
 
         {/* Export Button */}
         <Box
-          width="20%"
-          p="5px"
           display="flex"
+          alignItems="center"
           justifyContent="center"
           backgroundColor={colors.greenAccent[600]}
           borderRadius="4px"
+          p="0 15px"
+          height="40px"
           sx={{ cursor: "pointer" }}
           onClick={exportCSV}
         >
@@ -127,8 +140,8 @@ const Report = () => {
 
       {/* Data Grid */}
       <Box
-        m="10px 0 0 0"
-        height="75vh"
+        flexGrow={1}
+        minHeight={0}
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",

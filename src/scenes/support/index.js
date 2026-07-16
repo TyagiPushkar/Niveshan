@@ -407,8 +407,8 @@ const exportCombinedReport = async () => {
     }
   }, [ticketData]);
   return (
-    <Box m="20px">
-       <Box display="flex" justifyContent="space-between" alignItems="center" mb={0}>
+    <Box m="0 0 0 20px" height="calc(100vh - 75px)" display="flex" flexDirection="column">
+       <Box display="flex" justifyContent="space-between" alignItems="center" mb="10px">
       <Header title="Support Tickets" subtitle="Managing Support Tickets" />
       <Box display="flex" gap="10px">
         <Box
@@ -462,7 +462,7 @@ const exportCombinedReport = async () => {
       display="flex" 
       flexWrap="wrap" 
       gap={2} 
-      mb={3}
+      mb={2}
       sx={{
         '& > *': {
           flex: '1 1 200px',
@@ -536,8 +536,8 @@ const exportCombinedReport = async () => {
     
 
       <Box
-        m="10px 0 0 0"
-        height="75vh"
+        flexGrow={1}
+        minHeight={0}
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
