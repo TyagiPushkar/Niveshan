@@ -31,11 +31,13 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 };
 
 
-const Sidebar = () => {
+const Sidebar = ({ isSidebar, setIsSidebar }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+
+  const isCollapsed = isSidebar;
+  const setIsCollapsed = setIsSidebar;
 
   // Retrieve user data from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
@@ -123,25 +125,14 @@ const Sidebar = () => {
 
             {/* Admin-Only Routes */}
             {Role === "Admin" && (
-
-              
-              <Item
-              title="Dashboard"
-              to="/dashboard"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-                />
-            )}
-             <Item
-                  title="Profile"
-                  to="/"
-                  icon={<PersonOutlinedIcon />}
+              <>
+                <Item
+                  title="Dashboard"
+                  to="/dashboard"
+                  icon={<HomeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
                 />
-            {Role === "Admin" && (
-              <>
                 <Typography
                   variant="h6"
                   color={colors.grey[300]}
@@ -177,8 +168,6 @@ const Sidebar = () => {
                   selected={selected}
                   setSelected={setSelected}
                 />
-               
-                
               </>
             )}
              <Item

@@ -4,15 +4,16 @@ import {
   useTheme,
   Select,
   MenuItem,
-  Button,
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import DevicesIcon from "@mui/icons-material/Devices";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import WarningIcon from "@mui/icons-material/Warning";
 import Header from "../../components/Header";
-import StatBox from "../../components/StatBox";
 import PieChart from "../../components/PieChart";
 
 const Dashboard = () => {
@@ -102,7 +103,13 @@ const Dashboard = () => {
   );
 
   return (
-    <Box m="20px">
+    <Box
+      m="0 0 0 20px"
+      height="calc(100vh - 75px)"
+      display="flex"
+      flexDirection="column"
+      sx={{ overflowY: "auto", pr: "20px" }}
+    >
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
       </Box>
@@ -110,111 +117,196 @@ const Dashboard = () => {
       {/* Summary Grid */}
       <Box
         display="grid"
-        gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
+        gridTemplateColumns="repeat(auto-fit, minmax(220px, 1fr))"
         gap="20px"
-        mt="20px"
+        mt="10px"
       >
-        <Box onClick={() => navigate("/asset")} sx={{ cursor: "pointer" }}>
-          <StatBox
-            title={dashboardData.assetStats.totalAssets || 0}
-            subtitle="Total Assets"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-              />
+        {/* Total Assets */}
+        <Box
+          onClick={() => navigate("/asset")}
+          sx={{
+            cursor: "pointer",
+            backgroundColor: colors.primary[400],
+            borderRadius: "8px",
+            padding: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderLeft: `5px solid ${colors.blueAccent[500]}`,
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
             }
-          />
+          }}
+        >
+          <Box>
+            <Typography variant="h6" color={colors.grey[300]} fontWeight="500">
+              Total Assets
+            </Typography>
+            <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" mt="5px">
+              {dashboardData.assetStats.totalAssets || 0}
+            </Typography>
+          </Box>
+          <DevicesIcon sx={{ color: colors.blueAccent[500], fontSize: "40px" }} />
         </Box>
+
+        {/* Live Assets */}
         <Box
           onClick={() => navigate("/asset?status=Live")}
-          sx={{ cursor: "pointer" }}
-        >
-          <StatBox
-            title={dashboardData.assetStats.liveAssets || 0}
-            subtitle="Live Assets"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-              />
+          sx={{
+            cursor: "pointer",
+            backgroundColor: colors.primary[400],
+            borderRadius: "8px",
+            padding: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderLeft: `5px solid ${colors.greenAccent[500]}`,
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
             }
-          />
+          }}
+        >
+          <Box>
+            <Typography variant="h6" color={colors.grey[300]} fontWeight="500">
+              Live Assets
+            </Typography>
+            <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" mt="5px">
+              {dashboardData.assetStats.liveAssets || 0}
+            </Typography>
+          </Box>
+          <CheckCircleIcon sx={{ color: colors.greenAccent[500], fontSize: "40px" }} />
         </Box>
+
+        {/* In Stock Assets */}
         <Box
           onClick={() => navigate("/asset?status=In Stock")}
-          sx={{ cursor: "pointer" }}
-        >
-          <StatBox
-            title={dashboardData.assetStats.inStockAssets || 0}
-            subtitle="In Stock Assets"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-              />
+          sx={{
+            cursor: "pointer",
+            backgroundColor: colors.primary[400],
+            borderRadius: "8px",
+            padding: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderLeft: `5px solid #e2b13c`,
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
             }
-          />
+          }}
+        >
+          <Box>
+            <Typography variant="h6" color={colors.grey[300]} fontWeight="500">
+              In Stock Assets
+            </Typography>
+            <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" mt="5px">
+              {dashboardData.assetStats.inStockAssets || 0}
+            </Typography>
+          </Box>
+          <InventoryIcon sx={{ color: "#e2b13c", fontSize: "40px" }} />
         </Box>
+
+        {/* Faulty Assets */}
         <Box
           onClick={() => navigate("/asset?status=Faulty")}
-          sx={{ cursor: "pointer" }}
-        >
-          <StatBox
-            title={dashboardData.assetStats.faultyAssets || 0}
-            subtitle="Faulty Assets"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 30 }}
-              />
+          sx={{
+            cursor: "pointer",
+            backgroundColor: colors.primary[400],
+            borderRadius: "8px",
+            padding: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderLeft: `5px solid ${colors.redAccent[500]}`,
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 12px rgba(0, 0, 0, 0.2)",
             }
-          />
+          }}
+        >
+          <Box>
+            <Typography variant="h6" color={colors.grey[300]} fontWeight="500">
+              Faulty Assets
+            </Typography>
+            <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" mt="5px">
+              {dashboardData.assetStats.faultyAssets || 0}
+            </Typography>
+          </Box>
+          <WarningIcon sx={{ color: colors.redAccent[500], fontSize: "40px" }} />
         </Box>
       </Box>
 
+      {/* Visualizations and Tickets */}
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="120px"
         gap="20px"
         mt="20px"
+        mb="20px"
       >
+        {/* Pie Chart */}
         <Box
-          gridColumn="span 8"
-          gridRow="span 3"
+          gridColumn={{ xs: "span 12", md: "span 8" }}
           backgroundColor={colors.primary[400]}
+          borderRadius="8px"
+          boxShadow="0 4px 6px rgba(0, 0, 0, 0.1)"
+          p="20px"
+          display="flex"
+          flexDirection="column"
         >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb="10px">
             <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
+              <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
                 Asset Distribution
               </Typography>
-              <Select
-                value={selectedAssetName}
-                onChange={handleAssetNameChange}
-                displayEmpty
-              >
-                <MenuItem value="" disabled>
-                  Select Asset Name
-                </MenuItem>
-                {assetNames.length > 0 ? (
-                  assetNames.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      {name}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No Asset Names Available</MenuItem>
-                )}
-              </Select>
+              <Typography variant="body2" color={colors.grey[300]}>
+                Breakdown of asset statuses
+              </Typography>
             </Box>
+            <Select
+              value={selectedAssetName}
+              onChange={handleAssetNameChange}
+              displayEmpty
+              size="small"
+              sx={{
+                color: colors.grey[100],
+                bgcolor: colors.primary[500],
+                borderRadius: "4px",
+                minWidth: "150px",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            >
+              <MenuItem value="" disabled>
+                Select Asset Name
+              </MenuItem>
+              {assetNames.length > 0 ? (
+                assetNames.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No Asset Names Available</MenuItem>
+              )}
+            </Select>
           </Box>
           <Box height="300px" m="-20px 0 0 0">
             <PieChart
@@ -224,71 +316,115 @@ const Dashboard = () => {
           </Box>
         </Box>
 
+        {/* Support Tickets */}
         <Box
-          gridColumn="span 4"
-          gridRow="span 3"
+          gridColumn={{ xs: "span 12", md: "span 4" }}
           backgroundColor={colors.primary[400]}
+          borderRadius="8px"
+          boxShadow="0 4px 6px rgba(0, 0, 0, 0.1)"
+          p="20px"
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
         >
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
+            mb="15px"
+            borderBottom={`1px solid ${colors.primary[500]}`}
+            pb="10px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Tickets
+              Support Tickets Summary
             </Typography>
           </Box>
-          <StatBox
-            title={
-              <Link
-                to="/support-ticket"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
+
+          <Box display="flex" flexDirection="column" gap="15px" flexGrow={1} justifyContent="center">
+            {/* Total Tickets */}
+            <Box
+              onClick={() => navigate("/support-ticket")}
+              sx={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "15px 20px",
+                borderRadius: "6px",
+                backgroundColor: colors.primary[500],
+                transition: "background-color 0.2s",
+                "&:hover": {
+                  backgroundColor: colors.primary[300],
+                }
+              }}
+            >
+              <Box display="flex" alignItems="center" gap="15px">
+                <EmailIcon sx={{ color: colors.blueAccent[500], fontSize: "28px" }} />
+                <Typography variant="h6" color={colors.grey[100]} fontWeight="500">
+                  Total Tickets
+                </Typography>
+              </Box>
+              <Typography variant="h4" color={colors.blueAccent[500]} fontWeight="bold">
                 {dashboardData.ticketStats.totalTickets || 0}
-              </Link>
-            }
-            subtitle="Total Tickets"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 40 }}
-              />
-            }
-          />
-          <StatBox
-            title={
-              <Link
-                to="/support-ticket?status=Open"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
+              </Typography>
+            </Box>
+
+            {/* Open Tickets */}
+            <Box
+              onClick={() => navigate("/support-ticket?status=Open")}
+              sx={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "15px 20px",
+                borderRadius: "6px",
+                backgroundColor: colors.primary[500],
+                transition: "background-color 0.2s",
+                "&:hover": {
+                  backgroundColor: colors.primary[300],
+                }
+              }}
+            >
+              <Box display="flex" alignItems="center" gap="15px">
+                <EmailIcon sx={{ color: colors.redAccent[500], fontSize: "28px" }} />
+                <Typography variant="h6" color={colors.grey[100]} fontWeight="500">
+                  Open Tickets
+                </Typography>
+              </Box>
+              <Typography variant="h4" color={colors.redAccent[500]} fontWeight="bold">
                 {dashboardData.ticketStats.openTickets || 0}
-              </Link>
-            }
-            subtitle="Open Tickets"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 40 }}
-              />
-            }
-          />
-          <StatBox
-            title={
-              <Link
-                to="/support-ticket?status=Resolved"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
+              </Typography>
+            </Box>
+
+            {/* Resolved Tickets */}
+            <Box
+              onClick={() => navigate("/support-ticket?status=Resolved")}
+              sx={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "15px 20px",
+                borderRadius: "6px",
+                backgroundColor: colors.primary[500],
+                transition: "background-color 0.2s",
+                "&:hover": {
+                  backgroundColor: colors.primary[300],
+                }
+              }}
+            >
+              <Box display="flex" alignItems="center" gap="15px">
+                <EmailIcon sx={{ color: colors.greenAccent[500], fontSize: "28px" }} />
+                <Typography variant="h6" color={colors.grey[100]} fontWeight="500">
+                  Resolved Tickets
+                </Typography>
+              </Box>
+              <Typography variant="h4" color={colors.greenAccent[500]} fontWeight="bold">
                 {dashboardData.ticketStats.resolvedTickets || 0}
-              </Link>
-            }
-            subtitle="Resolved Tickets"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.greenAccent[600], fontSize: 40 }}
-              />
-            }
-          />
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>

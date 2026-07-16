@@ -53,14 +53,16 @@ const Contacts = () => {
   ];
 
   return (
-    <Box m="20px">
-      <Header
-        title="CONTACTS"
-        subtitle="List of Contacts for Future Reference"
-      />
+    <Box m="0 0 0 20px" height="calc(100vh - 75px)" display="flex" flexDirection="column">
+      <Box mb="10px">
+        <Header
+          title="CONTACTS"
+          subtitle="List of Contacts for Future Reference"
+        />
+      </Box>
       <Box
-        m="40px 0 0 0"
-        height="75vh"
+        flexGrow={1}
+        minHeight={0}
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",

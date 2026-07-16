@@ -186,30 +186,15 @@ useEffect(() => {
 
 
   return (
-    <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Box m="0 0 0 20px" height="calc(100vh - 75px)" display="flex" flexDirection="column">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb="10px">
         <Header title="ASSETS" subtitle="Managing the Assets" />
         <Box mt={2} mb={2}>
-          {/* <TextField
-            label="Search assets..."
-            variant="outlined"
-            fullWidth
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputLabelProps={{
-              style: { color: colors.grey[100] },
-            }}
-            InputProps={{
-              style: {
-                color: colors.grey[100],
-                backgroundColor: colors.primary[400],
-              },
-            }}
-          /> */}
           <Box display="flex" gap="15px" mt={2}>
             <TextField
               label="Asset ID"
               variant="outlined"
+              size="small"
               value={assetIdFilter}
               onChange={(e) => setAssetIdFilter(e.target.value)}
               InputLabelProps={{
@@ -219,12 +204,14 @@ useEffect(() => {
                 style: {
                   color: colors.grey[100],
                   backgroundColor: colors.primary[400],
+                  height: "40px",
                 },
               }}
             />
             <TextField
               label="Asset Name"
               variant="outlined"
+              size="small"
               value={assetNameFilter}
               onChange={(e) => setAssetNameFilter(e.target.value)}
               InputLabelProps={{
@@ -234,12 +221,14 @@ useEffect(() => {
                 style: {
                   color: colors.grey[100],
                   backgroundColor: colors.primary[400],
+                  height: "40px",
                 },
               }}
             />
             <TextField
               label="Asset Type"
               variant="outlined"
+              size="small"
               value={assetTypeFilter}
               onChange={(e) => setAssetTypeFilter(e.target.value)}
               InputLabelProps={{
@@ -249,12 +238,14 @@ useEffect(() => {
                 style: {
                   color: colors.grey[100],
                   backgroundColor: colors.primary[400],
+                  height: "40px",
                 },
               }}
             />
             <TextField
               label="Status"
               variant="outlined"
+              size="small"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               InputLabelProps={{
@@ -264,18 +255,21 @@ useEffect(() => {
                 style: {
                   color: colors.grey[100],
                   backgroundColor: colors.primary[400],
+                  height: "40px",
                 },
               }}
             />
           </Box>
         </Box>
-        <Box display="flex" gap="10px">
+        <Box display="flex" gap="10px" alignItems="center">
           <Box
-            p="5px"
             display="flex"
+            alignItems="center"
             justifyContent="center"
             backgroundColor={colors.greenAccent[600]}
             borderRadius="4px"
+            p="0 15px"
+            height="40px"
             sx={{ cursor: "pointer" }}
             onClick={handleRedirect}
           >
@@ -285,11 +279,13 @@ useEffect(() => {
             <Devices sx={{ color: colors.grey[100] }} />
           </Box>
           <Box
-            p="5px"
             display="flex"
+            alignItems="center"
             justifyContent="center"
             backgroundColor={colors.greenAccent[600]}
             borderRadius="4px"
+            p="0 15px"
+            height="40px"
             sx={{ cursor: "pointer" }}
             onClick={exportCSV}
           >
@@ -302,8 +298,8 @@ useEffect(() => {
       </Box>
 
       <Box
-        m="10px 0 0 0"
-        height="75vh"
+        flexGrow={1}
+        minHeight={0}
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",

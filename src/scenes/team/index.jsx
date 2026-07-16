@@ -11,13 +11,117 @@ import {
   DialogContent,
   Button,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, useGridApiContext } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import Header from "../../components/Header";
+
+const ResizableHeader = ({ params, columnWidths, setColumnWidths, colors }) => {
+  const apiRef = useGridApiContext();
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = (e) => {
+    if (e.button !== 0 && e.button !== 2) return; // Allow both left click (0) and right click (2)
+    e.stopPropagation();
+    e.preventDefault();
+    setIsDragging(true);
+    const startX = e.clientX;
+    const startWidth = params.colDef.computedWidth || params.colDef.width || 100;
+
+    const preventContextMenu = (contextEvent) => {
+      contextEvent.preventDefault();
+      contextEvent.stopPropagation();
+    };
+
+    const handleMouseMove = (moveEvent) => {
+      const currentWidth = startWidth + (moveEvent.clientX - startX);
+      const newWidth = Math.max(50, currentWidth);
+
+      if (apiRef && apiRef.current && apiRef.current.setColumnWidth) {
+        apiRef.current.setColumnWidth(params.field, newWidth);
+      }
+    };
+
+    const handleMouseUp = (moveEvent) => {
+      setIsDragging(false);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+
+      // Temporarily keep preventContextMenu active until this event cycle finishes
+      setTimeout(() => {
+        document.removeEventListener("contextmenu", preventContextMenu, true);
+      }, 50);
+
+      // Prevent the next click event from triggering sorting if dragging actually occurred
+      const preventClick = (clickEvent) => {
+        clickEvent.stopPropagation();
+        clickEvent.preventDefault();
+        document.removeEventListener("click", preventClick, true);
+      };
+
+      if (Math.abs(moveEvent.clientX - startX) > 2) {
+        document.addEventListener("click", preventClick, true);
+      }
+
+      const finalWidth = Math.max(50, startWidth + (moveEvent.clientX - startX));
+      setColumnWidths((prev) => ({
+        ...prev,
+        [params.field]: finalWidth,
+      }));
+    };
+
+    document.addEventListener("contextmenu", preventContextMenu, true);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  return (
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      width="100%"
+      height="100%"
+      sx={{
+        pr: "12px",
+      }}
+    >
+      <Typography fontWeight="bold" sx={{ color: colors.grey[100] }}>
+        {params.colDef.headerName}
+      </Typography>
+      <Box
+        className="resize-handle"
+        onMouseDown={handleMouseDown}
+        onContextMenu={(e) => e.preventDefault()}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onMouseUp={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        sx={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: "12px",
+          cursor: "col-resize",
+          zIndex: 100,
+          height: "100%",
+          backgroundColor: "transparent",
+          borderRight: "2px solid transparent",
+          borderColor: isDragging ? colors.greenAccent[500] : "transparent",
+          transition: "border-color 0.2s ease",
+        }}
+      />
+    </Box>
+  );
+};
 
 const Team = () => {
   const theme = useTheme();
@@ -33,8 +137,21 @@ const Team = () => {
     Mobile: "",
     Email: "",
     Role: "",
-    Functions:"",
+    Functions: "",
     Status: "",
+  });
+
+  const [columnWidths, setColumnWidths] = useState({
+    EmpId: 100,
+    Name: 160,
+    Mobile: 140,
+    Email: 220,
+    Role: 150,
+    RM_Name: 150,
+    RM_Mail: 220,
+    Status: 120,
+    DateOfJoining: 140,
+    Actions: 180,
   });
 
   // Fetch data from the API
@@ -153,18 +270,135 @@ const Team = () => {
   });
 
   const columns = [
-    { field: "EmpId", headerName: "EmpId", width: 100 },
-    { field: "Name", headerName: "Name", flex: 1 },
-    { field: "Mobile", headerName: "Mobile", flex: 1 },
-    { field: "Email", headerName: "Email", flex: 1 },
-    { field: "Role", headerName: "Designation", flex: 1 },
-    { field: "RM_Name", headerName: "RM Name", flex: 1 },
-    { field: "RM_Mail", headerName: "RM Mail", flex: 1 },
-    { field: "Status", headerName: "Status", flex: 1 },
-    { field: "DateOfJoining", headerName: "Date of Joining", flex: 1 },
+    {
+      field: "EmpId",
+      headerName: "EmpId",
+      width: columnWidths.EmpId,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "Name",
+      headerName: "Name",
+      width: columnWidths.Name,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "Mobile",
+      headerName: "Mobile",
+      width: columnWidths.Mobile,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "Email",
+      headerName: "Email",
+      width: columnWidths.Email,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "Role",
+      headerName: "Designation",
+      width: columnWidths.Role,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "RM_Name",
+      headerName: "RM Name",
+      width: columnWidths.RM_Name,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "RM_Mail",
+      headerName: "RM Mail",
+      width: columnWidths.RM_Mail,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "Status",
+      headerName: "Status",
+      width: columnWidths.Status,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
+    {
+      field: "DateOfJoining",
+      headerName: "Date of Joining",
+      width: columnWidths.DateOfJoining,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
+    },
     {
       field: "Actions",
       headerName: "Actions",
+      width: columnWidths.Actions,
+      renderHeader: (params) => (
+        <ResizableHeader
+          params={params}
+          columnWidths={columnWidths}
+          setColumnWidths={setColumnWidths}
+          colors={colors}
+        />
+      ),
       renderCell: (params) => (
         <>
           <IconButton onClick={() => handleRowClick(params)}>
@@ -181,60 +415,117 @@ const Team = () => {
                 params.row.Status === "Active",
               )
             }
-            style={{ color: "#3DA58A" }}
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: colors.greenAccent[500],
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: colors.greenAccent[500],
+              },
+            }}
           />
         </>
       ),
-      width: 200,
     },
   ];
 
   return (
-    <Box m="20px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Box m="0 0 0 20px" height="calc(100vh - 75px)" display="flex" flexDirection="column">
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb="10px">
         <Header title="TEAM" subtitle="Managing the Team Members" />
-        <Box mt={2} mb={2}>
+        <Box display="flex" alignItems="center" gap="15px">
           <TextField
             label="Search team..."
             variant="outlined"
-            fullWidth
+            size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputLabelProps={{
-              style: { color: colors.grey[100] }, // White text color for label
+              style: { color: colors.grey[100] },
             }}
             InputProps={{
               style: {
-                color: colors.grey[100], // White text color for input
-                backgroundColor: colors.primary[400], // Dark background
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
               },
             }}
+            sx={{ width: "250px" }}
           />
-        </Box>
-        <Box
-          width="20%"
-          p="5px"
-          display="flex"
-          justifyContent="center"
-          backgroundColor={colors.greenAccent[600]}
-          borderRadius="4px"
-          sx={{ cursor: "pointer" }}
-          onClick={() => navigate("/add-employee")}
-        >
-          <Typography color={colors.grey[100]} sx={{ mr: "5px" }}>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/add-employee")}
+            startIcon={<PersonOutlinedIcon />}
+            sx={{
+              backgroundColor: colors.greenAccent[600],
+              color: colors.grey[100],
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "8px 16px",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: colors.greenAccent[700],
+              },
+            }}
+          >
             Add New
-          </Typography>
-          <PersonOutlinedIcon sx={{ color: colors.grey[100] }} />
+          </Button>
         </Box>
       </Box>
       <Box
-        m="10px 0 0 0"
-        height="75vh"
+        flexGrow={1}
+        minHeight={0}
         sx={{
-          "& .MuiDataGrid-root": { border: "none" },
-          "& .MuiDataGrid-cell": { borderBottom: "none" },
+          "& .MuiDataGrid-root": {
+            border: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+          },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            borderRight: `1px solid ${colors.primary[500]}`,
+            position: "relative",
+          },
+          "& .MuiDataGrid-columnHeader:last-child": {
+            borderRight: "none",
+          },
+          "& .MuiDataGrid-columnSeparator": {
+            display: "none !important",
+          },
+          "& .MuiDataGrid-columnSeparatorContainer": {
+            display: "none !important",
+            pointerEvents: "none !important",
+          },
+          "& .MuiDataGrid-columnHeaderDraggableContainer": {
+            width: "100%",
+            position: "static !important",
+          },
+          "& .MuiDataGrid-columnHeaderTitleContainer": {
+            width: "100%",
+            maxWidth: "100%",
+            position: "static !important",
+          },
+          "& .MuiDataGrid-columnHeaderTitleContainerContent": {
+            width: "100%",
+            position: "static !important",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            width: "100%",
+            display: "block",
+            position: "static !important",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: colors.primary[400],
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+          },
+          "& .MuiCheckbox-root": {
+            color: `${colors.greenAccent[200]} !important`,
           },
         }}
       >
@@ -250,8 +541,18 @@ const Team = () => {
       </Box>
 
       {/* Edit Dialog */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle>Edit Employee</DialogTitle>
+      <Dialog
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: colors.primary[500],
+            backgroundImage: "none",
+            color: colors.grey[100],
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: colors.grey[100] }}>Edit Employee</DialogTitle>
         <DialogContent>
           <TextField
             label="Name"
@@ -259,6 +560,15 @@ const Team = () => {
             margin="dense"
             value={editData.Name}
             onChange={(e) => setEditData({ ...editData, Name: e.target.value })}
+            InputLabelProps={{
+              style: { color: colors.grey[100] },
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
+              },
+            }}
           />
           <TextField
             label="Mobile"
@@ -268,6 +578,15 @@ const Team = () => {
             onChange={(e) =>
               setEditData({ ...editData, Mobile: e.target.value })
             }
+            InputLabelProps={{
+              style: { color: colors.grey[100] },
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
+              },
+            }}
           />
           <TextField
             label="Email"
@@ -277,6 +596,15 @@ const Team = () => {
             onChange={(e) =>
               setEditData({ ...editData, Email: e.target.value })
             }
+            InputLabelProps={{
+              style: { color: colors.grey[100] },
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
+              },
+            }}
           />
           <TextField
             label="Designation"
@@ -284,6 +612,15 @@ const Team = () => {
             margin="dense"
             value={editData.Role}
             onChange={(e) => setEditData({ ...editData, Role: e.target.value })}
+            InputLabelProps={{
+              style: { color: colors.grey[100] },
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
+              },
+            }}
           />
           <TextField
             label="Department"
@@ -293,12 +630,28 @@ const Team = () => {
             onChange={(e) =>
               setEditData({ ...editData, Functions: e.target.value })
             }
+            InputLabelProps={{
+              style: { color: colors.grey[100] },
+            }}
+            InputProps={{
+              style: {
+                color: colors.grey[100],
+                backgroundColor: colors.primary[400],
+              },
+            }}
           />
-          <Box mt={2}>
+          <Box mt={2} display="flex" justifyContent="flex-end">
             <Button
               variant="contained"
-              color="primary"
               onClick={handleEditSubmit}
+              sx={{
+                backgroundColor: colors.greenAccent[600],
+                color: colors.grey[100],
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: colors.greenAccent[700],
+                },
+              }}
             >
               Save
             </Button>

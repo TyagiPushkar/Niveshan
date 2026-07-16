@@ -47,7 +47,7 @@ body,
 
 .content {
   flex-grow: 1;
-  padding: 20px;
+  padding: 0 0 0 10px;
   transition: all 0.3s ease;
 }
 

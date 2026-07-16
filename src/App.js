@@ -51,7 +51,7 @@ function App() {
                   <div className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
                     <Sidebar isSidebar={isSidebarCollapsed} setIsSidebar={setIsSidebarCollapsed} />
                   </div>
-                  <main className="content" style={{ marginBottom: "50px" }}>
+                  <main className="content">
                     <Topbar setIsSidebar={setIsSidebarCollapsed} />
                     <Routes>
                       {/* Public Routes */}
