@@ -8,10 +8,10 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Devices } from "@mui/icons-material";
-import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
-import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SummarizeIcon from '@mui/icons-material/Summarize';
+import SummarizeIcon from "@mui/icons-material/Summarize";
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -30,7 +30,6 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-
 const Sidebar = ({ isSidebar, setIsSidebar }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -42,8 +41,11 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
   // Retrieve user data from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
   const { Name, Role } = userDetails; // Destructure Name and Role from userDetails
- // Determine the logo based on theme mode
-  const logoSrc = theme.palette.mode === 'light' ? '../../assets/LogoLight.png' : '../../assets/Logo.png';
+  // Determine the logo based on theme mode
+  const logoSrc =
+    theme.palette.mode === "light"
+      ? "../../assets/LogoLight.png"
+      : "../../assets/Logo.png";
 
   return (
     <Box
@@ -88,7 +90,6 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                 <Typography variant="h3" color={colors.grey[100]}>
                   NIVESHAN
                 </Typography>
-                
               </Box>
             )}
           </MenuItem>
@@ -121,7 +122,6 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             {/* Public Route */}
-           
 
             {/* Admin-Only Routes */}
             {Role === "Admin" && (
@@ -133,6 +133,16 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                   selected={selected}
                   setSelected={setSelected}
                 />
+                {/* Profile button fixed to the bottom of the sidebar */}
+                {/* <Box sx={{ position: "absolute", bottom: 20, width: "100%" }}> */}
+                <Item
+                  title="Profile"
+                  to="/"
+                  icon={<PersonOutlinedIcon />}
+                  selected={selected}
+                  setSelected={setSelected}
+                />
+                {/* </Box> */}
                 <Typography
                   variant="h6"
                   color={colors.grey[300]}
@@ -161,7 +171,7 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                   selected={selected}
                   setSelected={setSelected}
                 />
-                 <Item
+                <Item
                   title="Reports"
                   to="/reports"
                   icon={<SummarizeIcon />}
@@ -170,14 +180,13 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                 />
               </>
             )}
-             <Item
-                  title="Support Ticket"
-                  to="/support-ticket"
-                  icon={<LiveHelpIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
+            <Item
+              title="Support Ticket"
+              to="/support-ticket"
+              icon={<LiveHelpIcon />}
+              selected={selected}
+              setSelected={setSelected}
             />
-            
           </Box>
         </Menu>
       </ProSidebar>
