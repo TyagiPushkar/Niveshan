@@ -142,15 +142,15 @@ const Team = () => {
   });
 
   const [columnWidths, setColumnWidths] = useState({
-    EmpId: 100,
+    EmpId: 80,
     Name: 160,
-    Mobile: 140,
+    Mobile: 100,
     Email: 220,
     Role: 150,
     RM_Name: 150,
-    RM_Mail: 220,
-    Status: 120,
-    DateOfJoining: 140,
+  //  RM_Mail: 200,
+    Status: 100,
+    DateOfJoining: 100,
     Actions: 180,
   });
 
@@ -348,19 +348,19 @@ const Team = () => {
         />
       ),
     },
-    {
-      field: "RM_Mail",
-      headerName: "RM Mail",
-      width: columnWidths.RM_Mail,
-      renderHeader: (params) => (
-        <ResizableHeader
-          params={params}
-          columnWidths={columnWidths}
-          setColumnWidths={setColumnWidths}
-          colors={colors}
-        />
-      ),
-    },
+    // {
+    //   field: "RM_Mail",
+    //   headerName: "RM Mail",
+    //   width: columnWidths.RM_Mail,
+    //   renderHeader: (params) => (
+    //     <ResizableHeader
+    //       params={params}
+    //       columnWidths={columnWidths}
+    //       setColumnWidths={setColumnWidths}
+    //       colors={colors}
+    //     />
+    //   ),
+    // },
     {
       field: "Status",
       headerName: "Status",
