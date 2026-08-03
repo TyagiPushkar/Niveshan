@@ -1,15 +1,11 @@
 import { Box, IconButton, useTheme, Menu, MenuItem, Modal, TextField, Button, Typography, Divider } from "@mui/material";
-import { useContext, useState, useEffect } from "react";
-import { ColorModeContext, tokens } from "../../theme";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { useState, useEffect } from "react";
+import { tokens } from "../../theme";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useNavigate } from "react-router-dom";
-import LogoutIcon from '@mui/icons-material/Logout';
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState(null); // State for dropdown menu
   const [openModal, setOpenModal] = useState(false); // State for modal visibility
   const [newPassword, setNewPassword] = useState(""); // New password
@@ -194,6 +190,23 @@ const Topbar = () => {
           <Divider sx={{ my: "10px", borderColor: colors.grey[700] }} />
 
           <Box display="flex" flexDirection="column" gap="8px" mt="5px">
+            <MenuItem 
+              onClick={() => {
+                navigate("/");
+                handleMenuClose();
+              }}
+              sx={{ 
+                borderRadius: "4px",
+                justifyContent: "center",
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                "&:hover": {
+                  backgroundColor: colors.blueAccent[600]
+                }
+              }}
+            >
+              My Profile
+            </MenuItem>
             <MenuItem 
               onClick={() => {
                 setOpenModal(true);

@@ -42,7 +42,11 @@ const Login = () => {
           }));
           setMessage('Login successful! Redirecting...');
           setTimeout(() => {
-            navigate('/dashboard'); // Redirect to dashboard after a short delay
+            if (data.Role === 'Admin') {
+              navigate('/dashboard');
+            } else {
+              navigate('/');
+            }
           }, 1000);
         } else {
           // Handle errors from the server

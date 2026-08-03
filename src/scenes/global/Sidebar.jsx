@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Box, Typography, useTheme } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -33,7 +33,8 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 const Sidebar = ({ isSidebar, setIsSidebar }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
+  const [selected, setSelected] = useState("Profile");
 
   const isCollapsed = isSidebar;
   const setIsCollapsed = setIsSidebar;
@@ -41,6 +42,18 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
   // Retrieve user data from local storage
   const userDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
   const { Name, Role } = userDetails; // Destructure Name and Role from userDetails
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === "/") setSelected("Profile");
+    else if (path === "/dashboard") setSelected("Dashboard");
+    else if (path === "/team") setSelected("Team");
+    else if (path === "/asset") setSelected("Assets");
+    else if (path === "/issue-asset") setSelected("Issue Asset");
+    else if (path === "/reports") setSelected("Reports");
+    else if (path === "/support-ticket") setSelected("Support Ticket");
+  }, [location.pathname]);
+
   // Determine the logo based on theme mode
   const logoSrc =
     theme.palette.mode === "light"
@@ -121,7 +134,14 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            {/* Public Route */}
+            {/* Profile Route available for all authenticated users */}
+            <Item
+              title="Profile"
+              to="/"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
 
             {/* Admin-Only Routes */}
             {Role === "Admin" && (
@@ -133,16 +153,6 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
                   selected={selected}
                   setSelected={setSelected}
                 />
-                {/* Profile button fixed to the bottom of the sidebar */}
-                {/* <Box sx={{ position: "absolute", bottom: 20, width: "100%" }}> */}
-                <Item
-                  title="Profile"
-                  to="/"
-                  icon={<PersonOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                />
-                {/* </Box> */}
                 <Typography
                   variant="h6"
                   color={colors.grey[300]}
